@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        {% load staticfiles %}
+        <link rel="stylesheet" href="{% static "main/style/style.css" %}">
+        <title>{% if title %}{{ title }}{% else %}Twiwei{% endif %} (*^__^*)</title>
+    {% endblock %}
+</head>
+
+<body>
+
+<div id="id-page-content">
+    {% block content %}
+
+    {% endblock %}
+</div>
+
+<div id="id-page-footer">
+    {% block footer %}
+
+    {% endblock %}
+</div>
+
+{% block script %}
+    <script src="{% static "main/script/script.js" %}"></script>
+{% endblock %}
+
+</body>
+
+</html>
