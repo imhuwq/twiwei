@@ -1,5 +1,88 @@
 {% extends "main/_base.html" %}
 
 {% block content %}
-    <h1>Ten Thousands Miles Away!</h1>
+
+    <div class="col-md-8">
+        <div id="id-page-main">
+
+            <div id="id-send-message" class="form-group">
+                <textarea name="message" id="id-message-box" class="form-control" cols="15" rows="6"></textarea>
+            </div>
+
+            <div id="id-time-line">
+
+                <ul class="nav nav-tabs">
+                    <li role="presentation" class="active"><a href="#">Home</a></li>
+                    <li role="presentation"><a href="#">Twitter</a></li>
+                    <li role="presentation"><a href="#">Weibo</a></li>
+                </ul>
+                <ul id="id-message-list">
+                    <li class="cls-message-items from-twitter">
+                        <div class="row">
+                            <div class="hidden-sm hidden-xs col-md-1 cls-user-thumbnail">
+                                <img src="https://pbs.twimg.com/profile_images/751072492345782272/xAIzLGl9_bigger.jpg"
+                                     alt="">
+                            </div>
+
+                            <div class="col-md-11 cls-user-message">
+                                <div class="cls-message-info">
+                                    <span class="cls-user-name">Pokemon GO!</span>
+                                    <span class="cls-message-time">  23小时</span>
+                                </div>
+
+                                <div class="cls-message-content">
+                                    <p>Everyone after a week of PokemonGO</p>
+                                    <img src="https://pbs.twimg.com/media/Cm3bhh3WcAACbvT.jpg" alt="">
+                                </div>
+
+                                <div class="cls-message-action">
+                                    <span>转发</span>
+                                    <span>评论</span>
+                                    <span>喜欢</span>
+                                    <span>更多</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cls-message-items from-twitter">
+                        <div class="row">
+                            <div class="col-md-1 cls-user-thumbnail">
+                                <img src="https://pbs.twimg.com/profile_images/751072492345782272/xAIzLGl9_bigger.jpg"
+                                     alt="">
+                            </div>
+
+                            <div class="col-md-11 cls-user-message">
+                                <div class="cls-message-info">
+                                    <span class="cls-user-name">Pokemon GO!</span>
+                                    <span class="cls-message-time">  23小时</span>
+                                </div>
+
+                                <div class="cls-message-content">
+                                    <p>Everyone after a week of PokemonGO</p>
+                                    <img src="https://pbs.twimg.com/media/Cm3bhh3WcAACbvT.jpg" alt="">
+                                </div>
+
+                                <div class="cls-message-action">
+                                    <span>转发</span>
+                                    <span>评论</span>
+                                    <span>喜欢</span>
+                                    <span>更多</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+
+    {#    <div class="col-mid-4">#}
+    {#        <div id="id-page-right">#}
+    {#            right side#}
+    {#        </div>#}
+    {#    </div>#}
+
+
 {% endblock %}

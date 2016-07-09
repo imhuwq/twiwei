@@ -3,28 +3,87 @@
 <head>
     {% block head %}
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% load staticfiles %}
-        <link rel="stylesheet" href="{% static "main/style/style.css" %}">
+        <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+        <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap-theme.min.css" %}">
+        <link rel="stylesheet" href="{% static "main/style.css" %}">
+
         <title>{% if title %}{{ title }}{% else %}Twiwei{% endif %} (*^__^*)</title>
     {% endblock %}
 </head>
 
-<body>
+<body> <!-- 三个 row: top-nav, content, footer -->
 
-<div id="id-page-content">
-    {% block content %}
 
-    {% endblock %}
+<div class="container">
+    <div class="row">
+        <div id="id-page-top-nav" class="col-md-12">
+            {% block topnav %}
+                <nav class="navbar navbar-default navbar-fixed-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">展开菜单</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="{% url 'main:index' %}">Twiwei</a>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                            <ul class="nav navbar-nav">
+                                <li><a href="#">Twitter</a></li>
+                                <li><a href="#">Weibo</a></li>
+                            </ul>
+
+                            <ul class="nav navbar-nav navbar-right">
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-haspopup="true"
+                                       aria-expanded="false">个人中心 <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">我的好友</a></li>
+                                        <li><a href="#">个人资料</a></li>
+                                        <li><a href="#">网站设置</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="#">注销登陆</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+                </nav>
+            {% endblock %}
+        </div>
+    </div> <!-- top-nav -->
+
+    <div class="row">
+        <div id="id-page-content">
+            {% block content %}
+
+            {% endblock %}
+        </div>
+    </div> <!-- content -->
+
+    <div class="row">
+        <div id="id-page-footer">
+            {% block footer %}
+
+            {% endblock %}
+        </div>
+    </div> <!-- footer -->
 </div>
 
-<div id="id-page-footer">
-    {% block footer %}
-
-    {% endblock %}
-</div>
 
 {% block script %}
-    <script src="{% static "main/script/script.js" %}"></script>
+    <script src="{% static "main/script.js" %}"></script>
+    <script src="{% static "jquery/jquery-2.2.4.min.js" %}"></script>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
 {% endblock %}
 
 </body>
