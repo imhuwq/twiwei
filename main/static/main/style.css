@@ -1,45 +1,17 @@
-body {
-    padding: 0;
-    margin: 0;
-}
-
-#id-page-content {
-    margin-top: 70px;
-}
-
-h1 {
-    text-align: center;
-    font-size: 2em;
-    color: grey;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-#id-message-list {
-    border-left: 1px solid lightgray;
-    border-right: 1px solid lightgray;
-
-}
-
-.cls-message-items {
-    padding: 5px 15px 0 15px;
-}
-
 .cls-user-thumbnail img {
-    width: 4em;
-    height: 4em;
+    max-width: 2em;
+    max-height: 2em;
 }
 
-.cls-message-items {
-    padding-bottom: 10px;
-    border-bottom: 1px solid lightgray;
-    margin-bottom: 20px;
+.panel-heading {
+    margin-bottom: 10px;
+}
+
+.panel-body {
+    padding-top: 0;
 }
 
 .cls-message-content img {
-    width: 100%;
-    height: 100%;
+    max-width: 20em;
+    max-height: 20em;
 }
