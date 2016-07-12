@@ -1,4 +1,5 @@
 {% extends "main/_base.html" %}
+{% load humanize %}
 
 {% block content %}
 
@@ -6,59 +7,93 @@
 
         <div class="col-md-6 col-md-offset-3">
 
-            <nav class="navbar navbar-default" role="navigation">
-                <div id="id-top-nav" class="navbar-header">
-                    <a role="presentation" class="navbar-brand" href="#">Home</a>
-                    <a role="presentation" class="navbar-brand" href="#">Twitter</a>
-                    <a role="presentation" class="navbar-brand" href="#">Weibo</a>
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#">Home</a>
+                        <a class="navbar-brand" href="#">Twitter</a>
+                        <a class="navbar-brand" href="#">Weibo</a>
+                    </div>
+
+
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">个人 <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">好友</a></li>
+                                    <li><a href="#">账户</a></li>
+                                    <li><a href="#">设置</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="{% url "main:site_logout" %}">注销</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">发布</a></li>
+
+                        {% else %}
+                            <li><a href="{% url 'main:site_login' %}?site=twitter">登陆</a></li>
+                        {% endif %}
+
+                    </ul>
+
                 </div>
             </nav>
 
 
             <div id="id-message-list">
+                {% for status in statuses %}
+                    <div class="cls-message-items from-twitter panel panel-info">
 
-                <div class="cls-message-items from-twitter panel panel-info">
-
-                    <div class="panel panel-heading">
+                        <div class="panel panel-heading">
                         <span class="cls-user-thumbnail">
-                            <img src="https://pbs.twimg.com/profile_images/751072492345782272/xAIzLGl9_bigger.jpg"
+                            <img src="{{ status.profile }}"
                                  alt="">
                         </span>
                         <span class="cls-message-info">
-                            <span class="cls-user-name">Pokemon GO!</span>
-                            <span class="cls-message-time">  23小时</span>
+                            <span class="cls-user-name">{{ status.writer }}</span>
+                            <span class="cls-message-time">  {{ status.time | naturaltime }}</span>
                         </span>
-                    </div>
+                        </div>
 
-                    <div class="panel panel-body">
-                        <div class="cls-user-message">
-                            <div class="cls-message-content">
-                                <p>Everyone after a week of PokemonGO</p>
-                                <img src="https://pbs.twimg.com/media/Cm3bhh3WcAACbvT.jpg" alt="">
-                            </div>
+                        <div class="panel panel-body">
+                            <div class="cls-user-message">
+                                <div class="cls-message-content">
+                                    <p class="cls-message-text">{{ status.text }}</p>
+                                    <div class="cls-message-img">
 
-                            <div class="cls-message-action">
-                                <span>转发</span>
-                                <span>评论</span>
-                                <span>喜欢</span>
-                                <span>更多</span>
+                                        {% for img in status.imgs %}
+                                            <div class="cls-img-wrapper">
+                                                <img src="{{ img.origi }}" class="cls-wei-img-origi" alt="">
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+
+                                <div class="cls-message-action">
+                                    <span>转发</span>
+                                    <span>评论</span>
+                                    <span>喜欢</span>
+                                    <span>更多</span>
+                                </div>
                             </div>
                         </div>
                     </div>
+                {% endfor %}
 
-                </div>
 
             </div>
+
         </div>
 
-    </div>
 
-
-    {#    <div class="col-mid-4">#}
-    {#        <div id="id-page-right">#}
-    {#            right side#}
-    {#        </div>#}
-    {#    </div>#}
+        {#    <div class="col-mid-4">#}
+        {#        <div id="id-page-right">#}
+        {#            right side#}
+        {#        </div>#}
+        {#    </div>#}
 
 
 {% endblock %}

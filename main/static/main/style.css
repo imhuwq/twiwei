@@ -11,7 +11,21 @@
     padding-top: 0;
 }
 
-.cls-message-content img {
-    max-width: 20em;
+.cls-message-img {
     max-height: 20em;
+    overflow: hidden;
+}
+
+.cls-img-wrapper {
+    overflow: hidden;
+    float: left;
+}
+
+.cls-img-wrapper img {
+    width: 100%;
+}
+
+.cls-message-action {
+    clear: left;
+    margin-top: 10px;
 }
