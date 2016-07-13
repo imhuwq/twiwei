@@ -2,12 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from django.http import HttpResponse
 
 from datetime import timedelta
 import time
 
-from .helpers import WeiboAPI, TwitterAPI
+from .helpers import login_required
+from .apis import WeiboAPI, TwitterAPI
 from .models import User
 
 
@@ -25,12 +25,16 @@ def home(request):
         if user.twi_id:
             data = twitter.get_user_timeline(user.twi_token, user.twi_token_secret)
             statuses.extend(twitter.extract_raw_statuses(data))
-    else:
-        data = weibo.get_pub_timeline(weibo.admin_token)
-        statuses = weibo.extract_raw_status(data)
-    statuses = sorted(statuses, key=lambda s: s.get('time'))
-    context = {'statuses': statuses}
-    return render(request, 'main/index.html', context=context)
+    elif weibo.admin_token:
+        statuses.extend(
+            weibo.extract_raw_status(weibo.get_pub_timeline(weibo.admin_token)))
+
+    if statuses:
+        statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
+        context = {'statuses': statuses}
+        return render(request, 'main/index.html', context=context)
+
+    return redirect(reverse('main:site_login'))
 
 
 def weibo_access_token(request):
@@ -41,18 +45,36 @@ def weibo_access_token(request):
     expire = data.get('expires_in')
     wei_id = data.get('uid')
 
-    User.objects.update_or_create(
-        wei_id=wei_id,
-        defaults={
+    if request.session.get('action') == 'linkto':
+        user = User.get_or_404(twi_id=request.user.twi_id)
+        old_user = User.get(wei_id=wei_id)
+        update_fields = {
+            'wei_id': wei_id,
             'wei_token': token,
             'wei_token_expire': timezone.now() + timedelta(0, int(expire) - 60),
-            'username': str(int(time.time()))
         }
-    )
-    user = authenticate(wei_id=wei_id)
-    login(request, user)
 
-    return redirect('main:home')
+        if old_user:
+            User.merge_user(old_user, user, update_fields)
+        else:
+            user.update_fields(update_fields)
+        return redirect(reverse('main:user_account'))
+
+    else:
+        u, c = User.objects.update_or_create(
+            wei_id=wei_id,
+            defaults={
+                'wei_token': token,
+                'wei_token_expire': timezone.now() + timedelta(0, int(expire) - 60),
+            }
+        )
+        if not u.username:
+            u.username = str(int(time.time()))
+            u.save()
+        user = authenticate(wei_id=wei_id)
+        login(request, user)
+
+        return redirect('main:home')
 
 
 def twitter_access_token(request):
@@ -66,21 +88,43 @@ def twitter_access_token(request):
         token = data.get('oauth_token')
         token_secret = data.get('oauth_token_secret')
         twi_id = data.get('user_id')
-        User.objects.update_or_create(
-            twi_id=twi_id,
-            defaults={
+
+        if request.session.get('action') == 'linkto':
+            user = User.get_or_404(wei_id=request.user.wei_id)
+            old_user = User.get(twi_id=twi_id)
+            update_fields = {
+                'twi_id': twi_id,
                 'twi_token': token,
-                'twi_token_secret': token_secret,
-                'username': str(int(time.time()))
+                'twi_token_secret': token_secret
             }
-        )
-        user = authenticate(twi_id=twi_id)
-        login(request, user)
-        return redirect('main:home')
+
+            if old_user:
+                User.merge_user(old_user, user, update_fields)
+            else:
+                user.update_fields(update_fields)
+            return redirect(reverse('main:user_account'))
+
+        else:
+            u, c = User.objects.update_or_create(
+                twi_id=twi_id,
+                defaults={
+                    'twi_token': token,
+                    'twi_token_secret': token_secret,
+                }
+            )
+            if not u.username:
+                u.username = str(int(time.time()))
+                u.save()
+            user = authenticate(twi_id=twi_id)
+            login(request, user)
+            return redirect('main:home')
+    return reverse('main:home')
 
 
 def site_login(request):
     site = request.GET.get('site', None)
+    request.session['action'] = request.GET.get('action', None)
+
     if site == 'weibo':
         weibo = WeiboAPI()
         return redirect(weibo.oauth2_url)
@@ -103,3 +147,8 @@ def site_logout(request):
         logout(request)
 
     return redirect(reverse('main:home'))
+
+
+@login_required
+def user_account(request):
+    return render(request, 'main/user/account.html')

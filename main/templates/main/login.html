@@ -1,0 +1,18 @@
+{% extends "main/components/_base.html" %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="col-md-12">
+            <table id="id-login-table" class="table table-bordered">
+                <tr id="id-login-choices">
+                    <td id="id-login-by-twi"><a href="{% url 'main:site_login' %}?site=twitter">Twi</a>
+                    </td>
+                    <td id="id-login-by-wei"><a href="{% url 'main:site_login' %}?site=weibo">Wei</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}

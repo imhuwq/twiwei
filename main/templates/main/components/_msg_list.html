@@ -1,0 +1,48 @@
+{% load humanize %}
+<div id="id-message-list">
+    {% for status in statuses %}
+        <div class="
+        {% if status.type == 'twi' %}cls-message-items from-twi panel panel-info
+        {% elif status.type == 'wei' %}cls-message-items from-wei panel panel-danger
+        {% endif %}
+        ">
+
+            <div class="panel panel-heading">
+                        <span class="cls-user-thumbnail">
+                            <img src="{{ status.profile }}"
+                                 alt="">
+                        </span>
+                        <span class="cls-message-info">
+                            <span class="cls-user-name">{{ status.writer }}</span>
+                            <span class="cls-message-time">  {{ status.time | naturaltime }}</span>
+                        </span>
+            </div>
+
+            <div class="panel panel-body">
+                <div class="cls-user-message">
+                    <div class="cls-message-content">
+                        <p class="cls-message-text">{{ status.text }}</p>
+                        <div class="cls-message-img">
+
+                            {% for img in status.imgs %}
+                                <div class="cls-img-wrapper">
+                                    <img src="{{ img.origi }}" class="cls-wei-img-origi" alt="">
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+
+                    <div class="cls-message-action">
+                        <span>转发</span>
+                        <span>评论</span>
+                        <span>喜欢</span>
+                        <span>更多</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+</div>
