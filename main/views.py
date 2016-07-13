@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.http import JsonResponse
 
 from datetime import timedelta
 import time
@@ -22,9 +23,14 @@ def home(request):
         if user.wei_id:
             data = weibo.get_user_timeline(user.wei_token)
             statuses.extend(weibo.extract_raw_status(data))
+            user.wei_head = statuses[0]['id']
+            user.wei_tail = statuses[-1]['id']
         if user.twi_id:
             data = twitter.get_user_timeline(user.twi_token, user.twi_token_secret)
             statuses.extend(twitter.extract_raw_statuses(data))
+            user.twi_head = statuses[0]['id']
+            user.twi_tail = statuses[-1]['id']
+        user.save()
     elif weibo.admin_token:
         statuses.extend(
             weibo.extract_raw_status(weibo.get_pub_timeline(weibo.admin_token)))
@@ -35,6 +41,41 @@ def home(request):
         return render(request, 'main/index.html', context=context)
 
     return redirect(reverse('main:site_login'))
+
+
+def load_more(request):
+    user = request.user
+    weibo = WeiboAPI()
+    twitter = TwitterAPI()
+    statuses = []
+    if user.is_authenticated:
+        if user.wei_id:
+            data = weibo.get_user_timeline(user.wei_token, max_id=user.wei_tail)
+            statuses.extend(weibo.extract_raw_status(data)[1:-1])
+            user.wei_tail = statuses[-1]['id']
+        if user.twi_id:
+            data = twitter.get_user_timeline(user.twi_token, user.twi_token_secret, max_id=user.twi_tail)
+            statuses.extend(twitter.extract_raw_statuses(data)[1:-1])
+            user.twi_tail = statuses[-1]['id']
+        user.save()
+        statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
+        return JsonResponse(
+            {
+                'status': 200,
+                'msg': '',
+                'content': statuses
+            }
+        )
+    return JsonResponse(
+        {
+            'status': 400,
+            'msg': '登陆后再使用该功能'
+        }
+    )
+
+
+def load_new(request):
+    pass
 
 
 def weibo_access_token(request):

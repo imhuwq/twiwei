@@ -2,15 +2,21 @@
 
 {% block content %}
 
-    <div class="container">
+    <div class="container" style="padding: 2px">
 
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12" style="padding: 0">
 
             {% include "main/components/_top_nav.html" %}
 
             {% include "main/components/_msg_list.html" %}
-
+            {% if user.is_authenticated %}
+                <div id="id-load-more">
+                    <span id="id-load-more-text">加载更多...</span>
+                    <a href="#id-top-nav"><span id="id-back-to-top" class="glyphicon glyphicon-chevron-up"
+                                                aria-hidden="true"></span></a>
+                </div>
+            {% endif %}
         </div>
-
+    </div>
 
 {% endblock %}

@@ -49,12 +49,13 @@ class WeiboAPI(object):
             'avatar': data.get('profile_image_url')
         }
 
-    def get_user_timeline(self, token, count=20, page=1):
+    def get_user_timeline(self, token, **kwargs):
         params = {
-            'access_token': token,
-            'count': count,
-            'page': page
+            'access_token': token
         }
+        for key, value in kwargs.items():
+            params[key] = value
+
         data = json.loads(requests.get(self.user_home_url, params).text)
         return data
 
@@ -94,6 +95,7 @@ class WeiboAPI(object):
             p_s['writer'] = u.get('name')
             p_s['profile'] = u.get('profile_image_url')
             p_s['type'] = 'wei'
+            p_s['id'] = r_s.get('id')
 
             pro_statuses.append(p_s)
 
@@ -162,8 +164,11 @@ class TwitterAPI(object):
         params = dict()
         for key, value in kwargs.items():
             params[key] = value
-        data = requests.get(self.user_homeline_url, params, auth=oauth, proxies=proxies).text
-        return json.loads(data)
+
+        data = requests.get(self.user_homeline_url, params, auth=oauth, proxies=proxies).json()
+        if data.get('errors'):
+            return []
+        return data
 
     @staticmethod
     def extract_raw_statuses(data):
@@ -184,6 +189,7 @@ class TwitterAPI(object):
                             'origi': m.get('media_url')
                         })
             status['type'] = 'twi'
+            status['id'] = d.get('id')
 
             statuses.append(status)
 

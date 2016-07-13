@@ -17,6 +17,12 @@ class User(AbstractUser):
     wei_token = models.CharField(max_length=60, null=True)
     wei_token_expire = models.DateTimeField(null=True)
 
+    twi_head = models.BigIntegerField(null=True)
+    twi_tail = models.BigIntegerField(null=True)
+
+    wei_head = models.BigIntegerField(null=True)
+    wei_tail = models.BigIntegerField(null=True)
+
     @property
     def is_linked_to_twi(self):
         return self.twi_id is not None

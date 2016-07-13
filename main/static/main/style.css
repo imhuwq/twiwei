@@ -43,3 +43,30 @@
     text-align: center;
     border: 1px solid #d8d3d3;
 }
+
+#id-load-more {
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+    text-align: center;
+    border: 1px solid #f1e9e9;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 1.2em;
+    border-radius: 5px;
+    color: gray;
+    cursor: pointer;
+    position: relative;
+}
+
+#id-back-to-top {
+    position: absolute;
+    right: 5px;
+    font-size: 1.2em;
+    padding: 5px 5px 5px 2em;
+    margin-left: 1.2em;
+}
+
+#id-load-more a {
+    text-decoration: none;
+    color: grey;
+}
