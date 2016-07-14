@@ -13,6 +13,14 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import random
 
+from django.core.exceptions import PermissionDenied
+
+
+def get_allowed_channels(request, channels):
+    if not request.user.is_authenticated():
+        raise PermissionDenied('请登陆')
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -41,10 +49,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+    'ws4redis'
 ]
 
 MIDDLEWARE_CLASSES = [
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +63,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'twiwei.urls'
@@ -66,14 +77,16 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ws4redis.context_processors.default',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'twiwei.wsgi.application'
+# WSGI_APPLICATION = 'twiwei.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
@@ -131,3 +144,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
+
+WEBSOCKET_URL = '/ws/'
+WS4REDIS_PREFIX = 'ws'
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WS4REDIS_ALLOWED_CHANNELS = get_allowed_channels
+
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_PREFIX = 'session'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': '/var/run/redis/redis.sock',
+    },
+}

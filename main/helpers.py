@@ -14,4 +14,3 @@ def login_required(func):
         return redirect(reverse('main:site_login'))
 
     return wrapper
-

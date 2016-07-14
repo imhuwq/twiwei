@@ -166,7 +166,7 @@ class TwitterAPI(object):
             params[key] = value
 
         data = requests.get(self.user_homeline_url, params, auth=oauth, proxies=proxies).json()
-        if data.get('errors'):
+        if type(data) != list:
             return []
         return data
 
