@@ -11,6 +11,11 @@ from .helpers import login_required
 from .apis import WeiboAPI, TwitterAPI
 from .models import User
 
+from ws4redis.publisher import RedisPublisher
+from ws4redis.redis_store import RedisMessage
+
+redis_publisher = RedisPublisher(facility='foobar', broadcast=True)
+
 
 # Create your views here.
 
@@ -45,6 +50,8 @@ def home(request):
 
 def load_more(request):
     user = request.user
+    message = RedisMessage(user.username + 'want more !')
+    redis_publisher.publish_message(message)
     weibo = WeiboAPI()
     twitter = TwitterAPI()
     statuses = []

@@ -16,9 +16,10 @@ import random
 from django.core.exceptions import PermissionDenied
 
 
-def get_allowed_channels(request, channels):
-    if not request.user.is_authenticated():
-        raise PermissionDenied('请登陆')
+# def get_allowed_channels(request, channels):
+#     # if not request.user.is_authenticated():
+#     #     raise PermissionDenied('请登陆')
+#     pass
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -148,7 +149,7 @@ STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
 WEBSOCKET_URL = '/ws/'
 WS4REDIS_PREFIX = 'ws'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-WS4REDIS_ALLOWED_CHANNELS = get_allowed_channels
+# WS4REDIS_ALLOWED_CHANNELS = get_allowed_channels
 
 SESSION_ENGINE = 'redis_sessions.session'
 SESSION_REDIS_PREFIX = 'session'

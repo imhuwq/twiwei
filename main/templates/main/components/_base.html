@@ -35,6 +35,7 @@
 
     <script>
         var $SCRIPT_ROOT = "{% url 'main:home' %}";
+        var $WEBSOCKET_URL = "{{ WEBSOCKET_URL }}";
     </script>
     <script src="{% static "main/script.js" %}"></script>
 {% endblock %}
@@ -42,3 +43,6 @@
 </body>
 
 </html>
+
+{#uwsgi --virtualenv /home/john/twiwei/env/ --socket /home/john/twiwei/tmp/django.socket --buffer-size=32768 --workers=5 --master --module wsgi_django#}
+{#uwsgi --virtualenv /home/john/twiwei/env/ --http-socket /home/john/twiwei/tmp/web.socket --gevent 1000 --http-websockets --workers=2 --master --module wsgi_websocket#}
