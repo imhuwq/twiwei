@@ -1,0 +1,10 @@
+alembic==0.8.6
+hiredis==0.2.0
+Mako==1.0.4
+MarkupSafe==0.23
+psycopg2==2.6.2
+python-editor==1.0.1
+six==1.10.0
+SQLAlchemy==1.0.14
+tornadis==0.7.0
+tornado==4.3

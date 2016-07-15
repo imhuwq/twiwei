@@ -2,3 +2,4 @@ env
 *.pyc
 te.py
 api_keys.py
+.idea
