@@ -21,7 +21,7 @@ cur_dir = os.path.abspath(os.path.dirname(__file__))
 par_dir = os.path.abspath(os.path.join(cur_dir, '..'))
 sys.path.append(par_dir)
 from app import models
-target_metadata = models.main.Model.metadata
+target_metadata = models.main.db.Model.metadata
 
 
 # other values from the config, defined by the needs of env.py,
@@ -65,7 +65,8 @@ def run_migrations_online():
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=target_metadata
+            compare_type=True,
+            target_metadata=target_metadata,
         )
 
         with context.begin_transaction():

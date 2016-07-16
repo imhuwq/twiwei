@@ -1,0 +1,43 @@
+{% extends "main/components/_base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="col-md-6 col-md-offset-3">
+
+            {% include "main/components/_top_nav.html" %}
+
+            <div id="id-user-info">
+                <table class="table table-hover">
+                    <tr>
+                        <th>用户名</th>
+                        <td>{{ user.username }}</td>
+                        <td>修改</td>
+                    </tr>
+                    <tr>
+                        <th>Twi</th>
+                        {% if user.is_linked_to_twi %}
+                            <td>已连接</td>
+                            <td>取消</td>
+                        {% else %}
+                            <td>未连接</td>
+                            <td><a href="/login/?site=twitter&action=linkto">连接</a></td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th>Wei</th>
+                        {% if user.is_linked_to_wei %}
+                            <td>已连接</td>
+                            <td>取消</td>
+                        {% else %}
+                            <td>未连接</td>
+                            <td><a href="/login/?site=weibo&action=linkto">连接</a></td>
+                        {% endif %}
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

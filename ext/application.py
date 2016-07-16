@@ -1,7 +1,6 @@
 import uuid
 
 from tornado.web import Application, RequestHandler
-
 from app.models.main import User
 
 
@@ -23,6 +22,8 @@ class BaseHandler(RequestHandler):
             self.set_secure_cookie("user_id", self.user_id)
         self.session_cache = self.application.session.get(self.user_id)
 
+        self.query = self.db.session.query
+
     @property
     def db(self):
         return self.application.db
@@ -38,4 +39,10 @@ class BaseHandler(RequestHandler):
     def get_current_user(self):
         if not self.user_id:
             return None
-        return self.db.query(User).get(int(self.user_id))
+        return self.query(User).get(int(self.user_id))
+
+    def login(self, user):
+        self.application.session.clr(self.user_id)
+        self.clear_all_cookies()
+        self.user_id = str(user.c_id)
+        self.set_secure_cookie("user_id", self.user_id)

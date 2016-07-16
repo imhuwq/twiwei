@@ -1,20 +1,135 @@
-from tornado.web import authenticated
+from datetime import datetime, timedelta
+
+from tornado.escape import json_encode
 
 from ext.application import BaseHandler
+from ..clients import Twitter, Weibo
+from ..models.main import User
+
+weibo = Weibo()
+twitter = Twitter()
 
 
 class IndexHandler(BaseHandler):
     def get(self):
-        greeting = self.get_argument('greeting', 'Hello')
-        self.write(greeting + self.user_id)
+        user = self.current_user
+        statuses = []
+        if user:
+            if user.c_wei_id:
+                data = weibo.get_user_timeline(user.c_wei_token)
+                statuses.extend(weibo.extract_raw_status(data))
+                user.c_wei_since = statuses[0]['id']
+                user.c_wei_max = statuses[-1]['id']
+            if user.c_twi_id:
+                data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_token_secret)
+                statuses.extend(twitter.extract_raw_statuses(data))
+                user.c_twi_since = statuses[0]['id']
+                user.c_twi_max = statuses[-1]['id']
+            self.db.session.commit()
+        elif weibo.admin_token:
+            raw = weibo.get_pub_timeline(weibo.admin_token)
+            status = weibo.extract_raw_status(raw)
+            statuses.extend(status)
+
+        if statuses:
+            statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
+            context = {'statuses': statuses}
+            return self.render('main/index.html', **context)
+
+        return self.redirect('/login')
+
+
+class LoadMoreHandler(BaseHandler):
+    def get(self):
+        user = self.current_user
+
+        statuses = []
+        if user:
+            if user.c_wei_id:
+                data = weibo.get_user_timeline(user.c_wei_token, max_id=user.c_wei_max)
+                statuses.extend(weibo.extract_raw_status(data)[1:-1])
+                user.c_wei_max = statuses[-1]['id']
+            if user.c_twi_id:
+                data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_token_secret, max_id=user.c_twi_max)
+                statuses.extend(twitter.extract_raw_statuses(data)[1:-1])
+                user.c_twi_max = statuses[-1]['id']
+            self.db.session.commit()
+            statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
+            return self.write(json_encode(
+                {
+                    'status': 200,
+                    'msg': '',
+                    'content': statuses
+                }
+            ))
+        return self.write(json_encode(
+            {
+                'status': 400,
+                'msg': '登陆后再使用该功能'
+            })
+        )
 
 
 class LoginHandler(BaseHandler):
     def get(self):
-        self.write("Login Page")
+        site = self.get_argument('site', default='local')
+        if site == 'weibo':
+            return self.redirect(weibo.oauth2_url)
+
+        elif site == 'twitter':
+            oauth_token, oauth_token_secret = twitter.request_token()
+
+            self.session['oauth_token'] = oauth_token
+            self.session['oauth_token_secret'] = oauth_token_secret
+
+            return self.redirect(twitter.authorize_url)
+
+        return self.render('main/login.html')
+
+
+class WeiboCallbackHandler(BaseHandler):
+    def get(self):
+        user = self.current_user
+        code = self.get_argument('code', default=None)
+        data = weibo.access_token(code)
+        token = data.get('access_token')
+        expire = data.get('expires_in')
+        wei_id = data.get('uid')
+
+        # 用户已经登陆， 说明是在用twitter账户链接weibo账户
+        if user:
+            old_user = self.query(User).filter_by(c_wei_id=wei_id)
+            update_fields = {
+                'c_wei_id': wei_id,
+                'c_wei_token': token,
+                'c_wei_token_expire': datetime.utcnow() + timedelta(0, int(expire) - 60),
+            }
+
+            if old_user:
+                User.merge_user(old_user, user, update_fields)
+            else:
+                user.update_fields(update_fields)
+            return self.redirect('/account')
+
+        # 用户没有登陆， 说明是直接用微博账户登录
+        else:
+            user = self.query(User).filter_by(c_wei_id=wei_id).first()
+            if not user:
+                user = User(c_wei_id=wei_id)
+                self.db.session.add(user)
+            user.c_wei_token = token
+            user.c_wei_expire = datetime.utcnow() + timedelta(0, int(expire) - 60)
+
+            self.db.session.commit()
+
+            self.login(user)
+
+            return self.redirect('/')
 
 
 handlers = [
     (r"/", IndexHandler),
-    (r"/", LoginHandler)
+    (r"/login", LoginHandler),
+    (r"/load_more", LoadMoreHandler),
+    (r"/oauth2/weibo/access_token/", WeiboCallbackHandler)
 ]
