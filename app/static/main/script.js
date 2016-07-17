@@ -1,25 +1,17 @@
 $(document).ready(function () {
+    load_home('load_home');
     var load_more = $("#id-load-more");
     load_more.on('click', function () {
-        $.get($SCRIPT_ROOT + 'load_more', {}, function (data) {
-            data = $.parseJSON(data);
-            if (data.status == 200) {
-                var statuses = data.content;
-                var last_status = $('.cls-message-items').eq(-1);
-                appendStatusesList(statuses, last_status);
-            }
-            else {
-                alert(data.msg)
-            }
-        })
+        request_statuses('load_more')
     });
 
 });
 
+
 function appendStatusesList(statuses, status_template) {
-    $('<hr/>').appendTo($('#id-message-list'));
     $.each(statuses, function (index, item) {
         var msg_item = status_template.clone();
+        msg_item.css("display", "block");
         if (item.type == 'wei') {
             msg_item.attr('class', 'cls-message-items from-wei panel panel-danger')
         }
@@ -54,7 +46,20 @@ function appendStatusesList(statuses, status_template) {
     })
 }
 
-function receiveMessage(msg) {
-    console.log(msg);
+function request_statuses(url) {
+    $.get($SCRIPT_ROOT + url, {}, function (data) {
+        data = $.parseJSON(data);
+        if (data.status == 200) {
+            var statuses = data.content;
+            var last_status = $('.cls-message-items').eq(-1);
+            appendStatusesList(statuses, last_status);
+        }
+        else {
+            alert(data.msg)
+        }
+    })
 }
 
+function load_home(url) {
+    request_statuses(url)
+}

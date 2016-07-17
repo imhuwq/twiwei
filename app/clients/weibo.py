@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import requests
 
 from config import WEI_CLIENT_ID, WEI_CLIENT_SECRET, WEI_ADMIN_TOKEN

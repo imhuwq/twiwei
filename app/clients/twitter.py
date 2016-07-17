@@ -1,4 +1,3 @@
-from datetime import datetime
 from requests_oauthlib import OAuth1
 import requests
 import re
@@ -83,7 +82,7 @@ class Twitter(object):
             status['writer'] = d.get('user').get('name')
             status['text'] = re.sub(r'https://t.co/.*', '', d.get('text', ''))
             status['profile'] = d.get('user').get('profile_image_url')
-            status['time'] = datetime.strptime(d.get('created_at'), '%a %b %d %H:%M:%S %z %Y')
+            status['time'] = d.get('created_at')
             status['fav_count'] = d.get('favorite_count')
             status['imgs'] = []
             ext_ent = d.get('extended_entities')

@@ -29,11 +29,11 @@ class User(db.Model):
 
     @property
     def is_linked_to_twi(self):
-        return self.twi_id is not None
+        return self.c_twi_id is not None
 
     @property
     def is_linked_to_wei(self):
-        return self.wei_id is not None
+        return self.c_wei_id is not None
 
     def update_fields(self, fields, instant_save=True):
         for field, value in fields.items():
@@ -52,11 +52,12 @@ class User(db.Model):
         if by_join_order:
             del_user, left_user = sorted([del_user, left_user], key=lambda u: u.date_joined)
 
-        for field in [x.name for x in left_user._meta.get_fields()]:
+        columns = [c for c in left_user.__dict__ if c.startswith('c_')]
+        for column in columns:
             # 不在手动更新序列中， 并且 left_user 这个 filed 的 value 为空， 则使用 del_user 的 value
-            if field not in update_fields and not getattr(left_user, field):
-                if getattr(del_user, field):
-                    setattr(left_user, field, getattr(del_user, field))
+            if column not in update_fields and not getattr(left_user, column):
+                if getattr(del_user, column):
+                    setattr(left_user, column, getattr(del_user, column))
 
         left_user.update_fields(update_fields, False)
 
