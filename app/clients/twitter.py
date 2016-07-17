@@ -1,6 +1,8 @@
-from requests_oauthlib import OAuth1
 import requests
 import re
+from datetime import datetime
+
+from requests_oauthlib import OAuth1
 
 from config import TWI_ADMIN_TOKEN_SECRET, TWI_ADMIN_TOKEN, TWI_CLIENT_ID, TWI_CLIENT_SECRET
 
@@ -82,7 +84,7 @@ class Twitter(object):
             status['writer'] = d.get('user').get('name')
             status['text'] = re.sub(r'https://t.co/.*', '', d.get('text', ''))
             status['profile'] = d.get('user').get('profile_image_url')
-            status['time'] = d.get('created_at')
+            status['time'] = datetime.strptime(d.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
             status['fav_count'] = d.get('favorite_count')
             status['imgs'] = []
             ext_ent = d.get('extended_entities')

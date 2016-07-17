@@ -14,44 +14,23 @@ twitter = Twitter()
 
 class IndexHandler(BaseHandler):
     def get(self):
-        # user = self.current_user
-        # statuses = []
-        # if user:
-        #     if user.c_wei_id:
-        #         data = weibo.get_user_timeline(user.c_wei_token)
-        #         statuses.extend(weibo.extract_raw_status(data))
-        #         user.c_wei_since = statuses[0]['id']
-        #         user.c_wei_max = statuses[-1]['id']
-        #     if user.c_twi_id:
-        #         data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_secret)
-        #         statuses.extend(twitter.extract_raw_statuses(data))
-        #         user.c_twi_since = statuses[0]['id']
-        #         user.c_twi_max = statuses[-1]['id']
-        #     self.db.session.commit()
-        # elif weibo.admin_token:
-        #     raw = weibo.get_pub_timeline(weibo.admin_token)
-        #     status = weibo.extract_raw_status(raw)
-        #     statuses.extend(status)
-        #
-        # if statuses:
-        #     statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
-        #     context = {'statuses': statuses}
         return self.render('main/index.html')
 
 
 class LoadHomeHandler(BaseHandler):
+    @coroutine
     def get(self):
         user = self.current_user
 
         statuses = []
         if user:
             if user.c_wei_id:
-                data = weibo.get_user_timeline(user.c_wei_token, max_id=user.c_wei_max)
+                data = weibo.get_user_timeline(user.c_wei_token)
                 statuses.extend(weibo.extract_raw_status(data)[1:-1])
                 user.c_wei_since = statuses[0]['id']
                 user.c_wei_max = statuses[-1]['id']
             if user.c_twi_id:
-                data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_secret, max_id=user.c_twi_max)
+                data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_secret)
                 if data:
                     statuses.extend(twitter.extract_raw_statuses(data)[1:-1])
                     user.c_twi_since = statuses[0]['id']

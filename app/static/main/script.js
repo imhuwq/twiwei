@@ -15,8 +15,8 @@ function appendStatusesList(statuses, status_template) {
         if (item.type == 'wei') {
             msg_item.attr('class', 'cls-message-items from-wei panel panel-danger')
         }
-        else {
-            msg_item.attr('class', 'cls-message-items from-twi panel panel-danger')
+        else if (item.type == 'twi') {
+            msg_item.attr('class', 'cls-message-items from-twi panel panel-info')
         }
         msg_item.find('.cls-user-thumbnail').find('img').attr('src', item.profile);
         msg_item.find('.cls-user-name').text(item.writer);

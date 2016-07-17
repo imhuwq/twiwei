@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 
 from config import WEI_CLIENT_ID, WEI_CLIENT_SECRET, WEI_ADMIN_TOKEN
@@ -68,7 +70,7 @@ class Weibo(object):
         for r_s in raw_statuses:
             p_s = dict()
 
-            p_s['time'] = r_s.get('created_at')
+            p_s['time'] = datetime.strptime(r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
             p_s['text'] = r_s.get('text')
 
             p_s['imgs'] = []
