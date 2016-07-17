@@ -92,7 +92,7 @@ class Twitter(object):
                 for m in ext_ent.get('media'):
                     if m.get('type', None) == 'photo':
                         status['imgs'].append({
-                            'origi': m.get('media_url')
+                            'middl': m.get('media_url')
                         })
             status['type'] = 'twi'
             status['id'] = d.get('id')

@@ -1,3 +1,6 @@
+/************************************************
+* 1. home page                                  *
+************************************************/
 .cls-user-thumbnail img {
     max-width: 2em;
     max-height: 2em;
@@ -11,37 +14,21 @@
     padding-top: 0;
 }
 
-.cls-message-img {
-    max-height: 20em;
-    overflow: hidden;
-}
-
 .cls-img-wrapper {
     overflow: hidden;
+    padding: 2px;
     float: left;
 }
 
 .cls-img-wrapper img {
     width: 100%;
+    min-height: 100%;
+    cursor: pointer;
 }
 
 .cls-message-action {
     clear: left;
     margin-top: 10px;
-}
-
-#id-login-table {
-    margin-top: 20em;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 50%;
-    box-shadow: 5px 5px 25px #888888;
-}
-
-#id-login-choices td {
-    padding: 5em 8em;
-    text-align: center;
-    border: 1px solid #d8d3d3;
 }
 
 #id-load-more {
@@ -58,6 +45,11 @@
     position: relative;
 }
 
+#id-load-more a {
+    text-decoration: none;
+    color: grey;
+}
+
 #id-back-to-top {
     position: absolute;
     right: 5px;
@@ -66,7 +58,33 @@
     margin-left: 1.2em;
 }
 
-#id-load-more a {
-    text-decoration: none;
-    color: grey;
+/************************************************
+* 2. login page                                 *
+************************************************/
+
+#id-login-choice-container {
+    margin-top: 10em;
+
+    border: 1px solid gray;
+    cursor: pointer;
+    padding: 0;
+}
+
+.cls-login-choice {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    font-size: 3em;
+    opacity: 0.5;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#id-login-by-twi {
+    border-bottom: 1px solid gray;
+    color: #2e6da4;
+}
+
+#id-login-by-wei {
+    color: #c7254e;
 }

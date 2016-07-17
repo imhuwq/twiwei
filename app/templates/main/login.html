@@ -1,18 +1,20 @@
 {% extends "components/_base.html" %}
 
 {% block content %}
-    <div class="container">
+<div class="container">
 
-        <div class="col-md-12">
-            <table id="id-login-table" class="table table-bordered">
-                <tr id="id-login-choices">
-                    <td id="id-login-by-twi"><a href="/login?site=twitter">Twi</a>
-                    </td>
-                    <td id="id-login-by-wei"><a href="/login?site=weibo">Wei</a>
-                    </td>
-                </tr>
-            </table>
+    <div class="col-md-4 col-md-offset-4" id="id-login-choice-container">
+
+        <div id="id-login-by-twi" class="cls-login-choice">
+            Twi
+        </div>
+
+        <div id="id-login-by-wei" class="cls-login-choice">
+            Wei
         </div>
 
     </div>
+
+
+</div>
 {% end %}

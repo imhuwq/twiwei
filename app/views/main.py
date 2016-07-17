@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from tornado.escape import json_encode
 from tornado.web import authenticated
 from tornado.gen import coroutine
+from dateutil import parser
 
 from ext.application import BaseHandler
 from ..clients import Twitter, Weibo
@@ -37,7 +38,7 @@ class LoadHomeHandler(BaseHandler):
                     user.c_twi_max = statuses[-1]['id']
 
             self.db.session.commit()
-            statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
+            statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
 
         elif weibo.admin_token:
             raw = weibo.get_pub_timeline(weibo.admin_token)
@@ -68,7 +69,7 @@ class LoadMoreHandler(BaseHandler):
                 statuses.extend(twitter.extract_raw_statuses(data)[1:-1])
                 user.c_twi_max = statuses[-1]['id']
             self.db.session.commit()
-            statuses = sorted(statuses, key=lambda s: s.get('time'), reverse=True)
+            statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
             return self.write(json_encode(
                 {
                     'status': 200,
