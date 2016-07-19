@@ -1,12 +1,18 @@
 from datetime import datetime
+import json
 
-import requests
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.httputil import url_concat
+from tornado.gen import coroutine
 
 from config import WEI_CLIENT_ID, WEI_CLIENT_SECRET, WEI_ADMIN_TOKEN
 
 
 class Weibo(object):
     def __init__(self):
+        AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+        self.client = AsyncHTTPClient()
+
         self.client_id = WEI_CLIENT_ID
         self.client_secret = WEI_CLIENT_SECRET
         self.admin_token = WEI_ADMIN_TOKEN
@@ -21,6 +27,13 @@ class Weibo(object):
         self.user_home_url = 'https://api.weibo.com/2/statuses/home_timeline.json'
         self.public_url = 'https://api.weibo.com/2/statuses/public_timeline.json'
 
+    @staticmethod
+    def gen_requests(method='GET', url=None, params=None):
+        url = url_concat(url, params)
+        request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
+        return request
+
+    @coroutine
     def access_token(self, code):
         params = {
             'client_id': self.client_id,
@@ -29,31 +42,42 @@ class Weibo(object):
             'redirect_uri': 'twiwei.com/oauth2/weibo/access_token/',
             'code': code
         }
-        data = requests.post(self.access_token_url, params).json()
-        return data
+        request = self.gen_requests('POST', self.access_token_url, params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response
 
+    @coroutine
     def get_user_info(self, token, uid):
 
         params = {
             'access_token': token,
             'uid': uid
         }
-        data = requests.get(self.user_info_url, params).json()
+        request = self.gen_requests('GET', self.user_info_url, params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
         return {
-            'name': data.get('name') + '@weibo',
-            'gender': data.get('gender'),
-            'avatar': data.get('profile_image_url')
+            'name': response.get('name') + '@weibo',
+            'gender': response.get('gender'),
+            'avatar': response.get('profile_image_url')
         }
 
-    def get_user_timeline(self, token, **kwargs):
-        params = {
-            'access_token': token
-        }
-        for key, value in kwargs.items():
-            params[key] = value
+    @coroutine
+    def get_user_timeline(self, token, valid_user=True, **kwargs):
+        if valid_user:
+            params = {
+                'access_token': token
+            }
+            for key, value in kwargs.items():
+                params[key] = value
+            request = self.gen_requests('GET', self.user_home_url, params)
+            response = yield self.client.fetch(request)
+            response = json.loads(response.body.decode())
+            return response
+        return []
 
-        return requests.get(self.user_home_url, params).json()
-
+    @coroutine
     def get_pub_timeline(self, token, count=20, page=1):
 
         params = {
@@ -61,7 +85,11 @@ class Weibo(object):
             'count': count,
             'page': page
         }
-        return requests.get(self.public_url, params).json()
+
+        request = self.gen_requests('GET', self.public_url, params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response
 
     @staticmethod
     def extract_raw_status(data):

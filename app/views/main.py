@@ -6,7 +6,7 @@ from tornado.gen import coroutine
 from dateutil import parser
 
 from ext.application import BaseHandler
-from ..clients import Twitter, Weibo
+from ext.clients import Twitter, Weibo
 from ..models.main import User
 
 weibo = Weibo()
@@ -25,27 +25,33 @@ class LoadHomeHandler(BaseHandler):
 
         statuses = []
         if user:
-            if user.c_wei_id:
-                data = weibo.get_user_timeline(user.c_wei_token)
-                statuses.extend(weibo.extract_raw_status(data)[1:-1])
+            is_user_valid_wei = user.c_wei_id is not None
+            is_user_valid_twi = user.c_twi_id is not None
+            data_wei, data_twi = yield [weibo.get_user_timeline(user.c_wei_token,
+                                                                valid_user=is_user_valid_wei),
+                                        twitter.get_user_timeline(user.c_twi_token,
+                                                                  user.c_twi_secret,
+                                                                  valid_user=is_user_valid_twi)]
+
+            if data_wei:
+                statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
                 user.c_wei_since = statuses[0]['id']
                 user.c_wei_max = statuses[-1]['id']
-            if user.c_twi_id:
-                data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_secret)
-                if data:
-                    statuses.extend(twitter.extract_raw_statuses(data)[1:-1])
-                    user.c_twi_since = statuses[0]['id']
-                    user.c_twi_max = statuses[-1]['id']
+
+            if data_twi:
+                statuses.extend(twitter.extract_raw_statuses(data_twi)[1:-1])
+                user.c_twi_since = statuses[0]['id']
+                user.c_twi_max = statuses[-1]['id']
 
             self.db.session.commit()
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
 
         elif weibo.admin_token:
-            raw = weibo.get_pub_timeline(weibo.admin_token)
+            raw = yield weibo.get_pub_timeline(weibo.admin_token)
             status = weibo.extract_raw_status(raw)
             statuses.extend(status)
-
-        return self.write(json_encode(
+            print(statuses)
+        self.write(json_encode(
             {
                 'status': 200,
                 'msg': '',
@@ -55,19 +61,27 @@ class LoadHomeHandler(BaseHandler):
 
 
 class LoadMoreHandler(BaseHandler):
+    @coroutine
     def get(self):
         user = self.current_user
 
         statuses = []
         if user:
-            if user.c_wei_id:
-                data = weibo.get_user_timeline(user.c_wei_token, max_id=user.c_wei_max)
-                statuses.extend(weibo.extract_raw_status(data)[1:-1])
+            is_user_valid_wei = user.c_wei_id is not None
+            is_user_valid_twi = user.c_twi_id is not None
+            data_wei, data_twi = yield [weibo.get_user_timeline(user.c_wei_token,
+                                                                valid_user=is_user_valid_wei),
+                                        twitter.get_user_timeline(user.c_twi_token,
+                                                                  user.c_twi_secret,
+                                                                  valid_user=is_user_valid_twi)]
+            if data_wei:
+                statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
                 user.c_wei_max = statuses[-1]['id']
-            if user.c_twi_id:
-                data = twitter.get_user_timeline(user.c_twi_token, user.c_twi_secret, max_id=user.c_twi_max)
-                statuses.extend(twitter.extract_raw_statuses(data)[1:-1])
+
+            if data_twi:
+                statuses.extend(twitter.extract_raw_statuses(data_twi)[1:-1])
                 user.c_twi_max = statuses[-1]['id']
+
             self.db.session.commit()
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
             return self.write(json_encode(
@@ -86,18 +100,19 @@ class LoadMoreHandler(BaseHandler):
 
 
 class LoginHandler(BaseHandler):
+    @coroutine
     def get(self):
         site = self.get_argument('site', default='local')
         if site == 'weibo':
             return self.redirect(weibo.oauth2_url)
 
         elif site == 'twitter':
-            oauth_token, oauth_token_secret = twitter.request_token()
+            oauth_token, oauth_token_secret = yield twitter.request_token()
 
             self.session.set(oauth_token=oauth_token,
                              oauth_token_secret=oauth_token_secret)
 
-            return self.redirect(twitter.authorize_url)
+            return self.redirect(twitter.authorize_url(oauth_token))
 
         return self.render('main/login.html')
 
@@ -113,10 +128,9 @@ class TwitterCallbackHandler(BaseHandler):
         user = self.current_user
         oauth_token = self.get_argument('oauth_token', default=None)
         oauth_verifier = self.get_argument('oauth_verifier', default=None)
-
         previous_oauth_token = yield self.session.get('oauth_token')
         if oauth_token == previous_oauth_token:
-            data = twitter.access_token(oauth_token, oauth_verifier)
+            data = yield twitter.access_token(oauth_token, oauth_verifier)
             token = data.get('oauth_token')
             token_secret = data.get('oauth_token_secret')
             twi_id = data.get('user_id')
@@ -153,10 +167,11 @@ class TwitterCallbackHandler(BaseHandler):
 
 
 class WeiboCallbackHandler(BaseHandler):
+    @coroutine
     def get(self):
         user = self.current_user
         code = self.get_argument('code', default=None)
-        data = weibo.access_token(code)
+        data = yield weibo.access_token(code)
         token = data.get('access_token')
         expire = data.get('expires_in')
         wei_id = data.get('uid')

@@ -3,10 +3,7 @@ from ext.session import session
 from ext.application import Tornado
 
 from config import settings
-from .views.main import handlers as mai_handlers
-
-handlers = []
-handlers.extend(mai_handlers)
+from .views import handlers
 
 
 def create_app(debug=True):

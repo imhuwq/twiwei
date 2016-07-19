@@ -32,6 +32,7 @@ class HandlerSession:
         items = yield self.get_all()
         if items:
             return items.get(key)
+        return None
 
     @tornado.gen.coroutine
     def set(self, **kwargs):
