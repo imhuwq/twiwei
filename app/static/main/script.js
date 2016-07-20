@@ -36,10 +36,10 @@ function appendStatusesList(statuses, status_template) {
         var msg_item = status_template.clone();
         msg_item.css("display", "block");
         if (item.type == 'wei') {
-            msg_item.attr('class', 'cls-message-items from-wei panel panel-danger')
+            msg_item.attr('class', 'container cls-message-items from-wei')
         }
         else if (item.type == 'twi') {
-            msg_item.attr('class', 'cls-message-items from-twi panel panel-info')
+            msg_item.attr('class', 'container cls-message-items from-twi')
         }
         msg_item.find('.cls-user-thumbnail').find('img').attr('src', item.profile);
         msg_item.find('.cls-user-name').text(item.writer);
@@ -53,17 +53,18 @@ function appendStatusesList(statuses, status_template) {
         var new_imgs = $('<div/>', {
             class: 'cls-message-img'
         });
-        var max_width = $("#id-top-nav").width() - 40;
-        var side_length = 0;
+        var max_width = $("#id-top-nav").width() * 0.85;
+        var max_height = $("#id-top-nav").width() * 0.85;
+        var cls = '';
+        var style = '';
         imgs = item.imgs;
         if (imgs.length == 1) {
-            side_length = max_width;
             $.each(item.imgs, function (index, img) {
-                var cls = "cls-img-wrapper img_1_0";
+                cls = "cls-img-wrapper img_1_0";
                 $('<div/>',
                     {
                         class: cls,
-                        style: "width:" + side_length + 'px;' + ";max-height:" + side_length + 'px;'
+                        style: "width:" + max_width + "px;max-height:" + max_height * 0.60 + "px;"
                     }).append($('<img/>', {
                     src: img.middl,
                     class: "cls-img-middl",
@@ -72,16 +73,17 @@ function appendStatusesList(statuses, status_template) {
             });
         }
         else if (imgs.length == 2) {
-            side_length = max_width * 0.5;
             $.each(item.imgs, function (index, img) {
-
-                var cls = "cls-img-wrapper img_1_1";
-
-
+                if (index == 0) {
+                    cls = "cls-img-wrapper img_1_1-l";
+                }
+                else {
+                    cls = "cls-img-wrapper img_1_1-r";
+                }
                 $('<div/>',
                     {
                         class: cls,
-                        style: "width:" + side_length + "px;height:" + side_length + 'px;'
+                        style: "width:" + max_width * 0.49 + "px;height:" + max_height * 0.49 + "px;"
                     }
                 ).append($('<img/>', {
                     src: img.middl,
@@ -92,16 +94,18 @@ function appendStatusesList(statuses, status_template) {
         }
         else if (imgs.length == 3) {
             $.each(item.imgs, function (index, img) {
-                var cls = "cls-img-wrapper img_1_2_r";
-                side_length = max_width * 0.33;
                 if (index == 0) {
                     cls = "cls-img-wrapper img_1_2_l";
-                    side_length = max_width * 0.66;
+                    style = "width:" + max_width * 0.62 + "px;height:" + max_height * 0.62 + "px;"
+                }
+                else {
+                    cls = "cls-img-wrapper img_1_2_r";
+                    style = "width:" + max_width * 0.32 + "px;height:" + max_height * 0.32 + "px;"
                 }
                 $('<div/>',
                     {
                         class: cls,
-                        style: "width:" + side_length + "px;height:" + side_length + 'px;'
+                        style: style
                     }
                 ).append($('<img/>', {
                     src: img.middl,
@@ -109,21 +113,30 @@ function appendStatusesList(statuses, status_template) {
                     href: img.middl
                 })).appendTo(new_imgs)
             });
-
         }
-        else if (imgs.length >= 4) {
+        else if (imgs.length > 3) {
             $.each(item.imgs, function (index, img) {
-                var cls = "cls-img-wrapper img_1_3_r";
-                side_length = max_width * 0.25;
                 if (index == 0) {
-                    cls = "cls-img-wrapper img_1_3_l";
-                    side_length = max_width * 0.75;
-                }
-                if (index <= 3) {
+                    cls = "cls-img-wrapper img_1_2_l";
+                    style = "width:" + max_width * 0.74 + "px;height:" + max_height * 0.75 + "px;";
                     $('<div/>',
                         {
                             class: cls,
-                            style: "width:" + side_length + "px;height:" + side_length + 'px;'
+                            style: style
+                        }
+                    ).append($('<img/>', {
+                        src: img.middl,
+                        class: "cls-img-middl",
+                        href: img.middl
+                    })).appendTo(new_imgs)
+                }
+                else if (index <= 3) {
+                    cls = "cls-img-wrapper img_1_2_r";
+                    style = "width:" + max_width * 0.24 + "px;height:" + max_height * 0.25 + "px;";
+                    $('<div/>',
+                        {
+                            class: cls,
+                            style: style
                         }
                     ).append($('<img/>', {
                         src: img.middl,
@@ -134,8 +147,7 @@ function appendStatusesList(statuses, status_template) {
                 else {
                     $('<div/>',
                         {
-                            class: cls,
-                            style: "width:" + side_length + "px;height:" + side_length + 'px;display:none'
+                            style: "display:none"
                         }
                     ).append($('<img/>', {
                         src: img.middl,
@@ -148,10 +160,9 @@ function appendStatusesList(statuses, status_template) {
         }
 
         new_imgs.appendTo(msg_item.find('.cls-message-content'));
-
         msg_item.appendTo($('#id-message-list'))
     });
-    register_gallery()
+    register_gallery();
 }
 
 function request_statuses(url) {
@@ -173,7 +184,7 @@ function load_home(url) {
 }
 
 function resize_imgs() {
-    var max_width = $("#id-top-nav").width() - 40;
+    var max_width = $("#id-top-nav").width() * 0.8;
 
     var img_1_0 = $(".img_1_0");
     var img_1_1 = $(".img_1_1");

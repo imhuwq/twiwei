@@ -48,8 +48,6 @@ class BaseHandler(RequestHandler):
     # 并且在数据库中能找到对应的用户数据
     # 就能保证目前处于已登陆状态
     def get_current_user(self):
-        if not self.user_id:
-            return None
         return self.query(User).get(int(self.user_id))
 
     # 登陆用户：

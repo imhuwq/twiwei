@@ -50,7 +50,6 @@ class LoadHomeHandler(BaseHandler):
             raw = yield weibo.get_pub_timeline(weibo.admin_token)
             status = weibo.extract_raw_status(raw)
             statuses.extend(status)
-            print(statuses)
         self.write(json_encode(
             {
                 'status': 200,

@@ -13,84 +13,32 @@ class Weibo(object):
         AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
         self.client = AsyncHTTPClient()
 
+        # 开发者 token
         self.client_id = WEI_CLIENT_ID
         self.client_secret = WEI_CLIENT_SECRET
         self.admin_token = WEI_ADMIN_TOKEN
 
+        # oauth 相关 url
         self.oauth2_url = 'https://api.weibo.com/oauth2/authorize?' \
                           'client_id=%s&' \
                           'response_type=code&' \
                           'redirect_uri=twiwei.com/oauth2/weibo/access_token/' % self.client_id
         self.access_token_url = 'https://api.weibo.com/oauth2/access_token'
 
-        self.user_info_url = 'https://api.weibo.com/2/users/show.json'
+        # 时间线相关 url
         self.user_home_url = 'https://api.weibo.com/2/statuses/home_timeline.json'
         self.public_url = 'https://api.weibo.com/2/statuses/public_timeline.json'
 
-    @staticmethod
-    def gen_requests(method='GET', url=None, params=None):
-        url = url_concat(url, params)
-        request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
-        return request
+        # 用户操作相关 url
+        self.like_weibo_url = 'https://api.weibo.com/2/favorites/create.json'
+        self.unlike_weibo_url = 'https://api.weibo.com/2/favorites/create.json'
 
-    @coroutine
-    def access_token(self, code):
-        params = {
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-            'grant_type': 'authorization_code',
-            'redirect_uri': 'twiwei.com/oauth2/weibo/access_token/',
-            'code': code
-        }
-        request = self.gen_requests('POST', self.access_token_url, params)
-        response = yield self.client.fetch(request)
-        response = json.loads(response.body.decode())
-        return response
+        # 用户信息相关 url
+        self.user_info_url = 'https://api.weibo.com/2/users/show.json'
 
-    @coroutine
-    def get_user_info(self, token, uid):
-
-        params = {
-            'access_token': token,
-            'uid': uid
-        }
-        request = self.gen_requests('GET', self.user_info_url, params)
-        response = yield self.client.fetch(request)
-        response = json.loads(response.body.decode())
-        return {
-            'name': response.get('name') + '@weibo',
-            'gender': response.get('gender'),
-            'avatar': response.get('profile_image_url')
-        }
-
-    @coroutine
-    def get_user_timeline(self, token, valid_user=True, **kwargs):
-        if valid_user:
-            params = {
-                'access_token': token
-            }
-            for key, value in kwargs.items():
-                params[key] = value
-            request = self.gen_requests('GET', self.user_home_url, params)
-            response = yield self.client.fetch(request)
-            response = json.loads(response.body.decode())
-            return response
-        return []
-
-    @coroutine
-    def get_pub_timeline(self, token, count=20, page=1):
-
-        params = {
-            'access_token': token,
-            'count': count,
-            'page': page
-        }
-
-        request = self.gen_requests('GET', self.public_url, params)
-        response = yield self.client.fetch(request)
-        response = json.loads(response.body.decode())
-        return response
-
+    #######################
+    # 以下是辅助函数        #
+    ######################
     @staticmethod
     def extract_raw_status(data):
         raw_statuses = data.get('statuses', [])
@@ -122,3 +70,92 @@ class Weibo(object):
             pro_statuses.append(p_s)
 
         return pro_statuses
+
+    @staticmethod
+    def gen_requests(method='GET', url=None, params=None):
+        url = url_concat(url, params)
+        request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
+        return request
+
+    #######################
+    # 以下是 oauth 相关函数 #
+    ######################
+    @coroutine
+    def access_token(self, code):
+        params = {
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'grant_type': 'authorization_code',
+            'redirect_uri': 'twiwei.com/oauth2/weibo/access_token/',
+            'code': code
+        }
+        request = self.gen_requests('POST', self.access_token_url, params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response
+
+    #######################
+    # 以下是用户信息相关函数 #
+    ######################
+    @coroutine
+    def get_user_info(self, token, uid):
+
+        params = {
+            'access_token': token,
+            'uid': uid
+        }
+        request = self.gen_requests('GET', self.user_info_url, params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return {
+            'name': response.get('name') + '@weibo',
+            'gender': response.get('gender'),
+            'avatar': response.get('profile_image_url')
+        }
+
+    #######################
+    # 以下是时间线相关函数   #
+    ######################
+    @coroutine
+    def get_user_timeline(self, token, valid_user=True, **kwargs):
+        if valid_user:
+            params = {
+                'access_token': token
+            }
+            for key, value in kwargs.items():
+                params[key] = value
+            try:
+                request = self.gen_requests('GET', self.user_home_url, params)
+                response = yield self.client.fetch(request)
+                response = json.loads(response.body.decode())
+                return response
+            except:
+                pass
+        return []
+
+    @coroutine
+    def get_pub_timeline(self, token, count=20, page=1):
+
+        params = {
+            'access_token': token,
+            'count': count,
+            'page': page
+        }
+
+        request = self.gen_requests('GET', self.public_url, params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response
+
+    #######################
+    # 以下是用户操作相关函数 #
+    ######################
+    @coroutine
+    def like_this_weibo(self, user, wei_id):
+        params = {
+            'access_token': user.c_wei_token,
+            'id': wei_id
+        }
+        request = self.gen_requests('GET', self.like_weibo_url, params=params)
+        response = yield self.client.fetch(request)
+        response = response.body.decode()

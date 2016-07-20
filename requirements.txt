@@ -5,6 +5,7 @@ MarkupSafe==0.23
 oauthlib==1.1.2
 psycopg2==2.6.2
 PySocks==1.5.7
+python-dateutil==2.5.3
 python-editor==1.0.1
 requests==2.10.0
 requests-oauthlib==0.6.2
