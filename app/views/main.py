@@ -69,10 +69,12 @@ class LoadMoreHandler(BaseHandler):
             is_user_valid_wei = user.c_wei_id is not None
             is_user_valid_twi = user.c_twi_id is not None
             data_wei, data_twi = yield [weibo.get_user_timeline(user.c_wei_token,
-                                                                valid_user=is_user_valid_wei),
+                                                                valid_user=is_user_valid_wei,
+                                                                max_id=str(user.c_wei_max)),
                                         twitter.get_user_timeline(user.c_twi_token,
                                                                   user.c_twi_secret,
-                                                                  valid_user=is_user_valid_twi)]
+                                                                  valid_user=is_user_valid_twi,
+                                                                  max_id=str(user.c_twi_max))]
             if data_wei:
                 statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
                 user.c_wei_max = statuses[-1]['id']

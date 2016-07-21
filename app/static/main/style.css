@@ -1,11 +1,24 @@
 /************************************************
+* 0. global set                                  *
+************************************************/
+body {
+    background-color: rgb(240, 240, 240);
+}
+
+#id-top-nav .container-fluid {
+    background-color: white !important;
+    border: 1px solid lightgray;
+    box-shadow: 1px 5px 5px rgb(235, 235, 235);
+}
+
+/************************************************
 * 1. home page                                  *
 ************************************************/
 #id-message-list {
     border: 1px solid lightgray;
     width: 100%;
     padding: 0;
-    background-color: rgb(250, 250, 250);
+    background-color: white;
     box-shadow: 1px 5px 5px rgb(235, 235, 235);
 }
 
@@ -29,13 +42,19 @@
     color: lightgray;
 }
 
+.cls-message-text {
+    word-break: normal;
+    word-wrap: break-word;
+}
+
 .cls-message-img {
     height: 100%;
 }
 
 .cls-user-thumbnail img {
-    max-width: 4em;
-    max-height: 4em;
+    min-width: 2.3em !important;
+    min-height: 2.3em !important;
+    border-radius: 3px;
 }
 
 .cls-img-wrapper {
@@ -66,16 +85,21 @@
 
 }
 
+.is-liked-true {
+    color: #d9534f !important;
+}
+
 #id-load-more {
     margin-top: 1.2em;
     margin-bottom: 1.2em;
     text-align: center;
-    border: 1px solid #f1e9e9;
     padding-top: 5px;
     padding-bottom: 5px;
     font-size: 1.2em;
-    border-radius: 5px;
     color: gray;
+    background-color: white;
+    border: 1px solid lightgray;
+    box-shadow: 1px 5px 5px rgb(235, 235, 235);
     cursor: pointer;
     position: relative;
 }

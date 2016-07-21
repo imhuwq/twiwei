@@ -61,13 +61,12 @@ class Twitter(object):
                     resource_owner_secret=None,
                     callback_uri=None, verifier=None,
                     use_proxy=True, **kwargs):
-
+        if kwargs:
+            url = url_concat(url, kwargs)
         headers = self.get_oauth_headers(method, url,
                                          resource_owner_key,
                                          resource_owner_secret,
                                          callback_uri, verifier)
-        if kwargs:
-            headers.update(kwargs)
         if use_proxy:
             request = HTTPRequest(url=url, method=method, headers=headers, allow_nonstandard_methods=True,
                                   prepare_curl_callback=self.set_socks5_proxy)

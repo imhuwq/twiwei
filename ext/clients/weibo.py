@@ -31,7 +31,8 @@ class Weibo(object):
 
         # 用户操作相关 url
         self.like_weibo_url = 'https://api.weibo.com/2/favorites/create.json'
-        self.unlike_weibo_url = 'https://api.weibo.com/2/favorites/create.json'
+        self.unlike_weibo_url = 'https://api.weibo.com/2/favorites/destroy.json'
+        self.get_replies_url = 'https://api.weibo.com/2/comments/show.json'
 
         # 用户信息相关 url
         self.user_info_url = 'https://api.weibo.com/2/users/show.json'
@@ -66,14 +67,15 @@ class Weibo(object):
             p_s['profile'] = u.get('profile_image_url')
             p_s['type'] = 'wei'
             p_s['id'] = r_s.get('id')
+            p_s['liked'] = r_s.get('favorited')
 
             pro_statuses.append(p_s)
 
         return pro_statuses
 
     @staticmethod
-    def gen_requests(method='GET', url=None, params=None):
-        url = url_concat(url, params)
+    def gen_requests(method='GET', url=None, **kwargs):
+        url = url_concat(url, kwargs)
         request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
         return request
 
@@ -89,7 +91,7 @@ class Weibo(object):
             'redirect_uri': 'twiwei.com/oauth2/weibo/access_token/',
             'code': code
         }
-        request = self.gen_requests('POST', self.access_token_url, params)
+        request = self.gen_requests('POST', self.access_token_url, **params)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response
@@ -104,7 +106,7 @@ class Weibo(object):
             'access_token': token,
             'uid': uid
         }
-        request = self.gen_requests('GET', self.user_info_url, params)
+        request = self.gen_requests('GET', self.user_info_url, **params)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return {
@@ -125,7 +127,7 @@ class Weibo(object):
             for key, value in kwargs.items():
                 params[key] = value
             try:
-                request = self.gen_requests('GET', self.user_home_url, params)
+                request = self.gen_requests('GET', self.user_home_url, **params)
                 response = yield self.client.fetch(request)
                 response = json.loads(response.body.decode())
                 return response
@@ -142,7 +144,7 @@ class Weibo(object):
             'page': page
         }
 
-        request = self.gen_requests('GET', self.public_url, params)
+        request = self.gen_requests('GET', self.public_url, **params)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response
@@ -151,11 +153,30 @@ class Weibo(object):
     # 以下是用户操作相关函数 #
     ######################
     @coroutine
-    def like_this_weibo(self, user, wei_id):
+    def like_this_weibo(self, access_token, wei_id):
         params = {
-            'access_token': user.c_wei_token,
+            'access_token': access_token,
             'id': wei_id
         }
-        request = self.gen_requests('GET', self.like_weibo_url, params=params)
+        request = self.gen_requests('POST', self.like_weibo_url, params=params)
         response = yield self.client.fetch(request)
-        response = response.body.decode()
+        response = json.loads(response.body.decode())
+        return response.get('favorited')
+
+    @coroutine
+    def unlike_this_weibo(self, access_token, wei_id):
+        params = {
+            'access_token': access_token,
+            'id': wei_id
+        }
+        request = self.gen_requests('POST', self.like_weibo_url, params=params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('favorited')
+
+    @coroutine
+    def get_weibo_replies(self, access_token, wei_id, since_id=0, max_id=0, **kwargs):
+        request = self.gen_requests('GET', self.get_replies_url, access_token=access_token,
+                                    wei_id=wei_id, since_id=since_id, max_id=max_id, **kwargs)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
