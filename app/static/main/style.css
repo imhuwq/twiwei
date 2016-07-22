@@ -84,6 +84,27 @@ body {
     cursor: pointer;
 
 }
+.cls-message-reply .input-group {
+    margin-bottom: 1em;
+}
+.cls-message-reply input{
+    border-radius: 0;
+}
+
+.cls-message-reply .input-group-addon {
+    border-radius: 0;
+    background-color: rgb(250, 250, 250);
+}
+
+.cls-message-reply ul {
+    padding: 5px 0 0;
+    border-bottom: none;
+}
+
+.cls-message-reply li {
+    border-bottom: 1px solid rgb(204, 204, 204);
+    list-style-type: none;
+}
 
 .is-liked-true {
     color: #d9534f !important;

@@ -48,14 +48,14 @@ $(document).ready(function () {
 });
 
 
-function appendStatusesList(statuses, status_template) {
+function append_messages_list(statuses, status_template) {
     $.each(statuses, function (index, item) {
         var msg_item = status_template.clone();
         var max_width = status_template.width() * 0.80;
         var max_height = status_template.width() * 0.80;
 
         set_general_attrs(msg_item, item, max_width, max_height);
-        set_type_specific_attrs(msg_item, item);
+        set_type_specific_attrs(msg_item, item, max_width);
         set_imgs_style(msg_item, item, max_width, max_height);
         msg_item.appendTo($('#id-message-list'))
     });
@@ -72,10 +72,14 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
     msg_item.find('.cls-message-text').css("width", max_width);
 }
 
-function set_type_specific_attrs(msg_item, item) {
+function set_type_specific_attrs(msg_item, item, max_width) {
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
     msg_item.attr('class', 'container cls-message-items from-' + item.type);
     msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
+
+    var reply_div_id = "id-reply-" + item.type + "-" + item.id;
+    msg_item.find('.cls-message-reply').attr('id', reply_div_id).css('max-width', max_width);
+    msg_item.find('.cls-reply-msg').attr('data-target', '#' + reply_div_id)
 }
 
 function set_imgs_style(msg_item, item, max_width, max_height) {
@@ -200,7 +204,7 @@ function request_statuses(url) {
         if (data.status == 200) {
             var statuses = data.content;
             var last_status = $('.cls-message-items').eq(-1);
-            appendStatusesList(statuses, last_status);
+            append_messages_list(statuses, last_status);
         }
         else {
             alert(data.msg)
@@ -313,20 +317,21 @@ function register_gallery() {
 }
 
 function like_or_unlike_msg(msg) {
-    var identity = msg.attr('id').split('-')[1];
+    var identity = msg.attr('id').split('-');
     var type = identity[1];
-    var id = identity[0];
+    var id = identity[2];
     var cls = msg.find('.cls-like-msg').attr('class');
     var liked = cls.split('-').pop();
     var data = {
         type: type,
         id: id,
-        liked: liked
+        liked: liked,
+        _xsrf: get_xsrf()
     };
 
     if (liked == 'false') {
         temporally_like_action(msg, 'like');
-        $.post($SCRIPT_ROOT + '/like_msg', data, function (data) {
+        $.post($SCRIPT_ROOT + type + '/like_msg', data, function (data) {
             if (data.status != 200) {
                 roll_back_like_action(msg, 'like')
             }
@@ -334,7 +339,7 @@ function like_or_unlike_msg(msg) {
     }
     else {
         temporally_like_action(msg, 'unlike');
-        $.post($SCRIPT_ROOT + '/unlike_msg', data, function (data) {
+        $.post($SCRIPT_ROOT + type + '/unlike_msg', data, function (data) {
             if (data.status != 200) {
                 roll_back_like_action(msg, 'unlike')
             }
@@ -367,10 +372,10 @@ function roll_back_like_action(msg, prev_action) {
     msg.find('.cls-like-msg').attr('class', new_cls);
 }
 
-function popup_retw_box(msg) {
+function dropdown_reply_list(msg) {
 
 }
 
-function dropdown_reply_list(msg) {
-
+function get_xsrf() {
+    return $("#xsrf").find("input").prop('value');
 }

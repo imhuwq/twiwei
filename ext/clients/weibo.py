@@ -65,7 +65,7 @@ class Weibo(object):
             u = r_s.get('user')
             p_s['writer'] = u.get('name')
             p_s['profile'] = u.get('profile_image_url')
-            p_s['type'] = 'wei'
+            p_s['type'] = 'weibo'
             p_s['id'] = r_s.get('id')
             p_s['liked'] = r_s.get('favorited')
 
@@ -76,6 +76,7 @@ class Weibo(object):
     @staticmethod
     def gen_requests(method='GET', url=None, **kwargs):
         url = url_concat(url, kwargs)
+        print(url)
         request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
         return request
 
@@ -158,7 +159,7 @@ class Weibo(object):
             'access_token': access_token,
             'id': wei_id
         }
-        request = self.gen_requests('POST', self.like_weibo_url, params=params)
+        request = self.gen_requests('POST', self.like_weibo_url, **params)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response.get('favorited')

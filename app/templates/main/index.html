@@ -8,11 +8,16 @@
         {% include "components/_top_nav.html" %}
 
         {% include "components/_msg_list.html" %}
-        {% if current_user %}
+
         <div id="id-load-more">
             <span id="id-load-more-text">加载更多...</span>
             <a href="#id-top-nav"><span id="id-back-to-top" class="glyphicon glyphicon-chevron-up"
                                         aria-hidden="true"></span></a>
+        </div>
+
+        {% if current_user %}
+        <div id="xsrf">
+            {% module xsrf_form_html() %}
         </div>
         {% end %}
 

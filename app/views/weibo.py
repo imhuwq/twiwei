@@ -15,9 +15,9 @@ twitter = Twitter()
 
 class LikeHandler(BaseHandler):
     @coroutine
-    def get(self):
+    def post(self):
         user = self.current_user
-        wei_id = self.get_argument('wei_id')
+        wei_id = self.get_argument('id')
         if user and wei_id:
             result = yield weibo.like_this_weibo(self.current_user.c_wei_token, wei_id)
             if result:
@@ -25,14 +25,14 @@ class LikeHandler(BaseHandler):
             else:
                 self.write(json_encode({'status': 500, 'msg': '操作失败！'}))
         self.write(json_encode({'status': 400, 'msg': '无效的请求'}))
-        self.finish()
+
 
 
 class UnLikeHandler(BaseHandler):
     @coroutine
     def get(self):
         user = self.current_user
-        wei_id = self.get_argument('wei_id')
+        wei_id = self.get_argument('id')
         if user and wei_id:
             result = yield weibo.unlike_this_weibo(self.current_user.c_wei_token, wei_id)
             if result is False:
@@ -53,8 +53,8 @@ class ReWeiHandler(BaseHandler):
 
 
 handlers = [
-    (r"/weibo/like", LikeHandler),
-    (r"/weibo/unlike", UnLikeHandler),
+    (r"/weibo/like_msg", LikeHandler),
+    (r"/weibo/unlike_msg", UnLikeHandler),
     (r"/weibo/reply", ReplyHandler),
     (r"/weibo/rewei", ReWeiHandler),
 ]

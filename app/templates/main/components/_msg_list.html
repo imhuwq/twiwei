@@ -30,7 +30,20 @@
                 <div class="cls-message-action">
                     <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-retweet cls-retw-msg" title="转发"></span>
                     <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-heart cls-like-msg" title="喜欢"></span>
-                    <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-share-alt cls-reply-msg" title="评论"></span>
+                    <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-share-alt cls-reply-msg" title="评论"
+                          data-toggle="collapse" data-target="#id-reply-wei-1234567"></span>
+                </div>
+                <div class="collapse cls-message-reply" id="id-reply-wei-1234567">
+                    <hr>
+
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                        <span class="input-group-addon">reply</span>
+                    </div>
+
+                    <ul>
+                        <li class="cls-reply-loading">正在加载评论...</li>
+                    </ul>
                 </div>
 
             </div>

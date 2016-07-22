@@ -134,7 +134,7 @@ class Twitter(object):
                         status['imgs'].append({
                             'middl': m.get('media_url')
                         })
-            status['type'] = 'twi'
+            status['type'] = 'twitter'
             status['id'] = d.get('id')
 
             statuses.append(status)
