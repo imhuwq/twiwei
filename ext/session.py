@@ -4,7 +4,9 @@ import json
 import tornado.gen
 
 
-class Session:
+class SessionManager:
+    """ 与 app 绑定的 session client, 一个 app 一个 redis client"""
+
     def __init__(self, app=None):
         self.app = app
         self.client = tornadis.Client(host="localhost", port=6379, autoconnect=True)
@@ -15,7 +17,9 @@ class Session:
         app.session = self
 
 
-class HandlerSession:
+class Session:
+    """ 与 handler 绑定的 session， 一个 handler 一个 session 对象， 公用一个 client"""
+
     def __init__(self, handler):
         self.handler = handler
         self.client = handler.application.session.client
@@ -53,4 +57,53 @@ class HandlerSession:
         yield self.client.call("del", 'session_%s' % self.handler.user_id)
 
 
-session = Session()
+class Cache:
+    """ cache 与 session 都是保存在 redis 中的缓存， session 保存用户关键信息，
+    cache 保存 statuses， 避免短时间内重复请求， cache 的 TTL 为 3 min"""
+
+    def __init__(self, handler):
+        self.handler = handler
+        self.client = handler.application.session.client
+
+    @tornado.gen.coroutine
+    def get_all(self, is_anonymous=False):
+        if not is_anonymous:
+            key = 'cache_%s' % self.handler.user_id
+        else:
+            key = 'cache_anonymous'
+
+        items = yield self.client.call("get", key)
+        if items:
+            items = json.loads(items.decode())
+            return items
+        return dict()
+
+    @tornado.gen.coroutine
+    def get(self, type, is_anonymous=False):
+        items = yield self.get_all(is_anonymous)
+        return items.get(type, [])
+
+    @tornado.gen.coroutine
+    def set(self, is_anonymous=False, **kwargs):
+        if kwargs:
+            if not is_anonymous:
+                key = 'cache_%s' % self.handler.user_id
+            else:
+                key = 'cache_anonymous'
+            items = yield self.get_all(is_anonymous)
+            items.update(**kwargs)
+            new_items = json.dumps(items)
+            yield self.client.call("set", key, new_items, 'ex', 180)
+
+    @tornado.gen.coroutine
+    def add(self, type, value):
+        key = 'cache_%s' % self.handler.user_id
+        items = yield self.get_all()
+        old_value = items.setdefault(type, [])
+        old_value.extend(value)
+        new_items = json.dumps(items)
+        ttl = yield self.client.call('ttl', key)
+        yield self.client.call("set", key, new_items, 'ex', ttl + 10)
+
+
+session = SessionManager()

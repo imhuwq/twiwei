@@ -3,7 +3,7 @@ import uuid
 from tornado.gen import coroutine
 from tornado.web import Application, RequestHandler
 
-from .session import HandlerSession
+from .session import Session, Cache
 from app.models.main import User
 
 
@@ -25,7 +25,8 @@ class BaseHandler(RequestHandler):
 
         self.db = self.application.db
         self.query = self.application.db.session.query
-        self.session = HandlerSession(self)
+        self.session = Session(self)
+        self.cache = Cache(self)
         self.sessions = dict()
 
         self.user_id = None

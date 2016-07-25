@@ -25,30 +25,43 @@ class LoadHomeHandler(BaseHandler):
 
         statuses = []
         if user:
-            is_user_valid_wei = user.c_wei_id is not None
-            is_user_valid_twi = user.c_twi_id is not None
-            data_wei, data_twi = yield [weibo.get_user_timeline(user.c_wei_token,
-                                                                valid_user=is_user_valid_wei),
-                                        twitter.get_user_timeline(user.c_twi_token,
-                                                                  user.c_twi_secret,
-                                                                  valid_user=is_user_valid_twi)]
+
+            data_wei = yield self.cache.get('weibo')
+            if data_wei:
+                data_wei = data_wei[0:20]
+            else:
+                data_wei = yield weibo.get_user_timeline(user.c_wei_token)
+                data_wei = weibo.extract_raw_status(data_wei)
+                self.cache.set(weibo=data_wei)
 
             if data_wei:
-                statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
-                self.session.set(wei_since=statuses[0]['id'],
-                                 wei_max=statuses[-1]['id'])
+                self.set_cookie('wei_since', str(data_wei[0]['id']))
+                self.set_cookie('wei_max', str(data_wei[-1]['id']))
+                statuses.extend(data_wei)
+
+            data_twi = yield self.cache.get('twitter')
+            if data_twi:
+                data_twi = data_twi[0:20]
+            else:
+                data_twi = yield twitter.get_user_timeline(user.c_twi_token,
+                                                           user.c_twi_secret)
+                data_twi = twitter.extract_raw_statuses(data_twi)
+                self.cache.set(twitter=data_twi)
 
             if data_twi:
-                statuses.extend(twitter.extract_raw_statuses(data_twi)[1:-1])
-                self.session.set(twi_since=statuses[0]['id'],
-                                 twi_max=statuses[-1]['id'])
+                self.set_cookie('twi_since', str(data_twi[0]['id']))
+                self.set_cookie('twi_max', str(data_twi[-1]['id']))
+                statuses.extend(data_twi)
 
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
 
         elif weibo.admin_token:
-            raw = yield weibo.get_pub_timeline(weibo.admin_token)
-            status = weibo.extract_raw_status(raw)
-            statuses.extend(status)
+            data = yield self.cache.get('anonymous', is_anonymous=True)
+            if not data:
+                data = yield weibo.get_pub_timeline(weibo.admin_token)
+                data = weibo.extract_raw_status(data)
+                self.cache.set(anonymous=data, is_anonymous=True)
+            statuses.extend(data)
         self.write(json_encode(
             {
                 'status': 200,
@@ -65,24 +78,31 @@ class LoadMoreHandler(BaseHandler):
 
         statuses = []
         if user:
-            is_user_valid_wei = user.c_wei_id is not None
-            is_user_valid_twi = user.c_twi_id is not None
-            data_wei, data_twi = yield [weibo.get_user_timeline(user.c_wei_token,
-                                                                valid_user=is_user_valid_wei,
-                                                                max_id=self.sessions.get('wei_max')),
-                                        twitter.get_user_timeline(user.c_twi_token,
-                                                                  user.c_twi_secret,
-                                                                  valid_user=is_user_valid_twi,
-                                                                  max_id=self.sessions.get('twi_max'))]
-            if data_wei:
-                statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
-                self.session.set(wei_max=statuses[-1]['id'])
+            wei_max = int(self.get_cookie('wei_max'))
+            data_wei = yield self.cache.get('weibo')
+            data_wei = [data for data in data_wei if data.get('id') < wei_max][0:20]
+            if not data_wei:
+                data_wei = yield weibo.get_user_timeline(user.c_wei_token,
+                                                         max_id=wei_max)
+                data_wei = weibo.extract_raw_status(data_wei)[1:-1]
+                self.cache.add('weibo', data_wei)
+            self.set_cookie('wei_max', str(data_wei[-1]['id']))
+            statuses.extend(data_wei)
 
-            if data_twi:
-                statuses.extend(twitter.extract_raw_statuses(data_twi)[1:-1])
-                self.session.set(twi_max=statuses[-1]['id'])
+            twi_max = int(self.get_cookie('twi_max'))
+            data_twi = yield self.cache.get('twitter')
+            data_twi = [data for data in data_twi if data.get('id') < twi_max][0:20]
+            if not data_twi:
+                data_twi = yield twitter.get_user_timeline(user.c_twi_token,
+                                                           user.c_twi_secret,
+                                                           max_id=twi_max)
+                data_twi = twitter.extract_raw_statuses(data_twi)[1:-1]
+                self.cache.add('twitter', data_twi)
+            self.set_cookie('twi_max', str(data_twi[-1]['id']))
+            statuses.extend(data_twi)
 
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
+
             return self.write(json_encode(
                 {
                     'status': 200,

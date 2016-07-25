@@ -103,8 +103,8 @@ class Twitter(object):
         return result
 
     @coroutine
-    def get_user_timeline(self, token, token_secret, valid_user=True, **kwargs):
-        if valid_user:
+    def get_user_timeline(self, token, token_secret, **kwargs):
+        if token and token_secret:
             request = self.gen_request('GET', self.user_homeline_url,
                                        resource_owner_key=token,
                                        resource_owner_secret=token_secret,
@@ -114,7 +114,6 @@ class Twitter(object):
             if type(response) != list:
                 return []
             return response
-        return []
 
     @staticmethod
     def extract_raw_statuses(data):

@@ -120,21 +120,17 @@ class Weibo(object):
     # 以下是时间线相关函数   #
     ######################
     @coroutine
-    def get_user_timeline(self, token, valid_user=True, **kwargs):
-        if valid_user:
+    def get_user_timeline(self, token, **kwargs):
+        if token:
             params = {
                 'access_token': token
             }
             for key, value in kwargs.items():
                 params[key] = value
-            try:
-                request = self.gen_requests('GET', self.user_home_url, **params)
-                response = yield self.client.fetch(request)
-                response = json.loads(response.body.decode())
-                return response
-            except:
-                pass
-        return []
+            request = self.gen_requests('GET', self.user_home_url, **params)
+            response = yield self.client.fetch(request)
+            response = json.loads(response.body.decode())
+            return response
 
     @coroutine
     def get_pub_timeline(self, token, count=20, page=1):
