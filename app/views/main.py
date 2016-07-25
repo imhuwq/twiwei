@@ -35,15 +35,14 @@ class LoadHomeHandler(BaseHandler):
 
             if data_wei:
                 statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
-                user.c_wei_since = statuses[0]['id']
-                user.c_wei_max = statuses[-1]['id']
+                self.session.set(wei_since=statuses[0]['id'],
+                                 wei_max=statuses[-1]['id'])
 
             if data_twi:
                 statuses.extend(twitter.extract_raw_statuses(data_twi)[1:-1])
-                user.c_twi_since = statuses[0]['id']
-                user.c_twi_max = statuses[-1]['id']
+                self.session.set(twi_since=statuses[0]['id'],
+                                 twi_max=statuses[-1]['id'])
 
-            self.db.session.commit()
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
 
         elif weibo.admin_token:
@@ -70,20 +69,19 @@ class LoadMoreHandler(BaseHandler):
             is_user_valid_twi = user.c_twi_id is not None
             data_wei, data_twi = yield [weibo.get_user_timeline(user.c_wei_token,
                                                                 valid_user=is_user_valid_wei,
-                                                                max_id=str(user.c_wei_max)),
+                                                                max_id=self.sessions.get('wei_max')),
                                         twitter.get_user_timeline(user.c_twi_token,
                                                                   user.c_twi_secret,
                                                                   valid_user=is_user_valid_twi,
-                                                                  max_id=str(user.c_twi_max))]
+                                                                  max_id=self.sessions.get('twi_max'))]
             if data_wei:
                 statuses.extend(weibo.extract_raw_status(data_wei)[1:-1])
-                user.c_wei_max = statuses[-1]['id']
+                self.session.set(wei_max=statuses[-1]['id'])
 
             if data_twi:
                 statuses.extend(twitter.extract_raw_statuses(data_twi)[1:-1])
-                user.c_twi_max = statuses[-1]['id']
+                self.session.set(twi_max=statuses[-1]['id'])
 
-            self.db.session.commit()
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
             return self.write(json_encode(
                 {

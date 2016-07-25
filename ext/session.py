@@ -36,19 +36,20 @@ class HandlerSession:
 
     @tornado.gen.coroutine
     def set(self, **kwargs):
-        items = yield self.get_all()
-        items.update(**kwargs)
-        new_items = json.dumps(items)
+        self.handler.sessions.update(**kwargs)
+        new_items = json.dumps(self.handler.sessions)
         yield self.client.call("set", 'session_%s' % self.handler.user_id, new_items)
 
     @tornado.gen.coroutine
     def rename(self, new_key):
         items = yield self.get(self.handler.user_id)
         if items:
+            self.handler.sessions = items
             yield self.client.call("rename", 'session_%s' % self.handler.user_id, 'session_%s' % new_key)
 
     @tornado.gen.coroutine
     def delete(self):
+        self.handler.sessions = dict()
         yield self.client.call("del", 'session_%s' % self.handler.user_id)
 
 
