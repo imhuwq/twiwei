@@ -5,21 +5,43 @@ body {
     background-color: rgb(240, 240, 240);
 }
 
+#id-top-nav {
+    border: none;
+}
+
 #id-top-nav .container-fluid {
     background-color: white !important;
-    border: 1px solid lightgray;
-    box-shadow: 1px 5px 5px rgb(235, 235, 235);
+}
+
+@media (min-width: @screen-sm-min) {
+    #id-top-nav {
+        background-color: white !important;
+        border: 1px solid lightgray;
+        box-shadow: 1px 5px 5px rgb(235, 235, 235);
+    }
+
+    #id-top-nav .container-fluid {
+        background-color: white !important;
+        border: 1px solid lightgray;
+        box-shadow: 1px 5px 5px rgb(235, 235, 235);
+    }
 }
 
 /************************************************
 * 1. home page                                  *
 ************************************************/
 #id-message-list {
-    border: 1px solid lightgray;
     width: 100%;
     padding: 0;
+    margin: 0;
     background-color: white;
     box-shadow: 1px 5px 5px rgb(235, 235, 235);
+}
+
+@media (min-width: @screen-sm-min) {
+    #id-message-list {
+        border: 1px solid lightgray;
+    }
 }
 
 .cls-message-items {
@@ -86,17 +108,22 @@ body {
 
 #id-load-more {
     margin-top: 1.2em;
-    margin-bottom: 1.2em;
+    margin-bottom: 3px;
     text-align: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     font-size: 1.2em;
     color: gray;
     background-color: white;
-    border: 1px solid lightgray;
     box-shadow: 1px 5px 5px rgb(235, 235, 235);
     cursor: pointer;
     position: relative;
+}
+
+@media (min-width: @screen-sm-min) {
+    #id-load-more {
+        border: 1px solid lightgray;
+    }
 }
 
 #id-load-more a {
