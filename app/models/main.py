@@ -7,22 +7,15 @@ class User(db.Model):
     __tablename__ = "users"
 
     c_id = Column("id", BigInteger, primary_key=True)
-    c_username = Column("username", String(20))
-    c_email = Column("email", String)
-    c_password = Column("password", String(60))
     c_join = Column("join", DateTime)
 
     c_twi_id = Column("twi_id", BigInteger)
     c_twi_token = Column("twi_token", String(60))
     c_twi_secret = Column("twi_secret", String(120))
-    c_twi_max = Column("twi_max", BigInteger)
-    c_twi_since = Column("twi_since", BigInteger)
 
     c_wei_id = Column("wei_id", BigInteger)
     c_wei_token = Column("wei_token", String(60))
     c_wei_expire = Column("wei_expire", DateTime)
-    c_wei_max = Column("wei_max", BigInteger)
-    c_wei_since = Column("wei_since", BigInteger)
 
     def __repr__(self):
         return "<User: %s, join at %s>" % (self.c_username, str(self.c_join))
@@ -50,7 +43,7 @@ class User(db.Model):
         """
 
         if by_join_order:
-            del_user, left_user = sorted([del_user, left_user], key=lambda u: u.date_joined)
+            del_user, left_user = sorted([del_user, left_user], key=lambda u: u.join)
 
         columns = [c for c in left_user.__dict__ if c.startswith('c_')]
         for column in columns:

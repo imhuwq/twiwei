@@ -18,14 +18,6 @@ $(document).ready(function () {
             var msg = $(this).parents('.cls-message-items');
             like_or_unlike_msg(msg)
         });
-        msg_list.on("click", ".cls-retw-msg", function () {
-            var msg = $(this).parents('.cls-message-items');
-            popup_retw_box(msg)
-        });
-        msg_list.on("click", ".cls-reply-msg", function () {
-            var msg = $(this).parents('.cls-message-items');
-            dropdown_reply_list(msg)
-        });
 
         $('.image-link').magnificPopup({type: 'image'});
     }
@@ -79,7 +71,11 @@ function set_type_specific_attrs(msg_item, item, max_width) {
 
     var reply_div_id = "id-reply-" + item.type + "-" + item.id;
     msg_item.find('.cls-message-reply').attr('id', reply_div_id).css('max-width', max_width);
-    msg_item.find('.cls-reply-msg').attr('data-target', '#' + reply_div_id)
+    msg_item.find('.cls-reply-msg').attr('data-target', '#' + reply_div_id);
+
+    var retw_div_id = "id-retw-" + item.type + "-" + item.id;
+    msg_item.find('.cls-message-retw').attr('id', retw_div_id);
+    msg_item.find('.cls-retw-msg').attr('data-target', '#' + retw_div_id)
 }
 
 function set_imgs_style(msg_item, item, max_width, max_height) {
