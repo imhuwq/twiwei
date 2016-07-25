@@ -36,6 +36,7 @@ class Weibo(object):
 
         # 用户信息相关 url
         self.user_info_url = 'https://api.weibo.com/2/users/show.json'
+        self.liked_url = 'https://api.weibo.com/2/favorites/ids.json'
 
     #######################
     # 以下是辅助函数        #
@@ -67,7 +68,7 @@ class Weibo(object):
             p_s['profile'] = u.get('profile_image_url')
             p_s['type'] = 'weibo'
             p_s['id'] = r_s.get('id')
-            p_s['liked'] = r_s.get('favorited')
+            p_s['liked'] = r_s.get('liked', False)
 
             pro_statuses.append(p_s)
 
@@ -76,7 +77,6 @@ class Weibo(object):
     @staticmethod
     def gen_requests(method='GET', url=None, **kwargs):
         url = url_concat(url, kwargs)
-        print(url)
         request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
         return request
 
@@ -116,6 +116,18 @@ class Weibo(object):
             'avatar': response.get('profile_image_url')
         }
 
+    @coroutine
+    def get_liked_msg(self, token):
+        params = {
+            'access_token': token,
+            'count': 10000
+        }
+        request = self.gen_requests('GET', self.liked_url, **params)
+        response = yield self.client.fetch(request)
+        liked_msgs = json.loads(response.body.decode()).get("favorites", [])
+        ids = [msg.get('status') for msg in liked_msgs]
+        return ids
+
     #######################
     # 以下是时间线相关函数   #
     ######################
@@ -130,7 +142,8 @@ class Weibo(object):
             request = self.gen_requests('GET', self.user_home_url, **params)
             response = yield self.client.fetch(request)
             response = json.loads(response.body.decode())
-            return response
+            statuses = self.extract_raw_status(response)
+            return statuses
 
     @coroutine
     def get_pub_timeline(self, token, count=20, page=1):
@@ -144,7 +157,8 @@ class Weibo(object):
         request = self.gen_requests('GET', self.public_url, **params)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
-        return response
+        statuses = self.extract_raw_status(response)
+        return statuses
 
     #######################
     # 以下是用户操作相关函数 #

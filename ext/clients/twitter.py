@@ -29,6 +29,9 @@ class Twitter(object):
 
         self.oauth_callback = 'http://twiwei.com/oauth2/twitter/access_token/'
 
+        self.like_msg_url = 'https://api.twitter.com/1.1/favorites/create.json'
+        self.unlike_msg_url = 'https://api.twitter.com/1.1/favorites/destroy.json'
+
         self.admin_token = TWI_ADMIN_TOKEN
         self.admin_token_secret = TWI_ADMIN_TOKEN_SECRET
 
@@ -112,8 +115,9 @@ class Twitter(object):
             response = yield self.client.fetch(request)
             response = json.loads(response.body.decode())
             if type(response) != list:
-                return []
-            return response
+                response = []
+            statuses = self.extract_raw_statuses(response)
+            return statuses
 
     @staticmethod
     def extract_raw_statuses(data):
@@ -124,7 +128,7 @@ class Twitter(object):
             status['text'] = re.sub(r'https://t.co/.*', '', d.get('text', ''))
             status['profile'] = d.get('user').get('profile_image_url')
             status['time'] = datetime.strptime(d.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
-            status['fav_count'] = d.get('favorite_count')
+            status['liked'] = d.get('favorited')
             status['imgs'] = []
             ext_ent = d.get('extended_entities')
             if ext_ent:
@@ -134,8 +138,25 @@ class Twitter(object):
                             'middl': m.get('media_url')
                         })
             status['type'] = 'twitter'
-            status['id'] = d.get('id')
+            status['id'] = str(d.get('id'))
 
             statuses.append(status)
 
         return statuses
+
+    @coroutine
+    def like_this_msg(self, token, token_secret, msg_id):
+        request = self.gen_request('POST', self.like_msg_url, resource_owner_key=token,
+                                   resource_owner_secret=token_secret, id=msg_id)
+        print(request.url)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('favorited')
+
+    @coroutine
+    def unlike_this_msg(self, token, token_secret, msg_id):
+        request = self.gen_request('POST', self.unlike_msg_url, resource_owner_key=token,
+                                   resource_owner_secret=token_secret, id=msg_id)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('favorited')
