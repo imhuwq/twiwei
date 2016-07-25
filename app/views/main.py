@@ -26,17 +26,17 @@ class LoadHomeHandler(BaseHandler):
         statuses = []
         if user:
 
-            # data_wei = yield self.cache.get('weibo')
-            # if data_wei:
-            #     data_wei = data_wei[0:20]
-            # else:
-            #     token = user.c_wei_token
-            #     data_wei = yield weibo.get_user_timeline(token)
-            #     self.cache.set(weibo=data_wei)
-            # if data_wei:
-            #     self.set_cookie('wei_since', str(data_wei[0]['id']))
-            #     self.set_cookie('wei_max', str(data_wei[-1]['id']))
-            #     statuses.extend(data_wei)
+            data_wei = yield self.cache.get('weibo')
+            if data_wei:
+                data_wei = data_wei[0:20]
+            else:
+                token = user.c_wei_token
+                data_wei = yield weibo.get_user_timeline(token)
+                self.cache.set(weibo=data_wei)
+            if data_wei:
+                self.set_cookie('wei_since', str(data_wei[0]['id']))
+                self.set_cookie('wei_max', str(data_wei[-1]['id']))
+                statuses.extend(data_wei)
 
             data_twi = yield self.cache.get('twitter')
             if data_twi:
@@ -51,12 +51,12 @@ class LoadHomeHandler(BaseHandler):
                 statuses.extend(data_twi)
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)
 
-        # elif weibo.admin_token:
-        #     data = yield self.cache.get('anonymous', is_anonymous=True)
-        #     if not data:
-        #         data = yield weibo.get_pub_timeline(weibo.admin_token)
-        #         self.cache.set(anonymous=data, is_anonymous=True)
-        #     statuses.extend(data)
+        elif weibo.admin_token:
+            data = yield self.cache.get('anonymous', is_anonymous=True)
+            if not data:
+                data = yield weibo.get_pub_timeline(weibo.admin_token)
+                self.cache.set(anonymous=data, is_anonymous=True)
+            statuses.extend(data)
         self.write(json_encode(
             {
                 'status': 200,
@@ -73,15 +73,15 @@ class LoadMoreHandler(BaseHandler):
 
         statuses = []
         if user:
-            # wei_max = int(self.get_cookie('wei_max'))
-            # data_wei = yield self.cache.get('weibo')
-            # data_wei = [data for data in data_wei if data.get('id') < wei_max][0:20]
-            # if not data_wei:
-            #     data_wei = yield weibo.get_user_timeline(user.c_wei_token,
-            #                                              max_id=wei_max)
-            #     self.cache.add('weibo', data_wei)
-            # self.set_cookie('wei_max', str(data_wei[-1]['id']))
-            # statuses.extend(data_wei)
+            wei_max = int(self.get_cookie('wei_max'))
+            data_wei = yield self.cache.get('weibo')
+            data_wei = [data for data in data_wei if data.get('id') < wei_max][0:20]
+            if not data_wei:
+                data_wei = yield weibo.get_user_timeline(user.c_wei_token,
+                                                         max_id=wei_max)
+                self.cache.add('weibo', data_wei)
+            self.set_cookie('wei_max', str(data_wei[-1]['id']))
+            statuses.extend(data_wei)
 
             twi_max = int(self.get_cookie('twi_max'))
             data_twi = yield self.cache.get('twitter')
@@ -141,6 +141,7 @@ class TwitterCallbackHandler(BaseHandler):
         oauth_token = self.get_argument('oauth_token', default=None)
         oauth_verifier = self.get_argument('oauth_verifier', default=None)
         previous_oauth_token = yield self.session.get('oauth_token')
+        self.session.delete()
         if oauth_token == previous_oauth_token:
             data = yield twitter.access_token(oauth_token, oauth_verifier)
             token = data.get('oauth_token')

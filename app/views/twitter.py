@@ -16,45 +16,43 @@ class LikeHandler(BaseHandler):
     @coroutine
     def post(self):
         user = self.current_user
-        wei_id = self.get_argument('id')
-        if user and wei_id:
-            result = yield twitter.like_this_msg(user.c_twi_token, user.c_twi_secret, msg_id=wei_id)
+        twi_id = self.get_argument('id')
+        if user and twi_id:
+            result = yield twitter.like_this_msg(user.c_twi_token, user.c_twi_secret, msg_id=twi_id)
             if result:
-                self.write(json_encode({'status': 200, 'msg': ''}))
+                cache = yield self.cache.get('twitter')
+                if cache:
+                    liked_msg = [msg for msg in cache if msg['id'] == twi_id][0]
+                    liked_msg['liked'] = True
+                    self.cache.set(ttl=0, twitter=cache)
+                return self.write(json_encode({'status': 200, 'msg': ''}))
             else:
-                self.write(json_encode({'status': 500, 'msg': '操作失败！'}))
-        self.write(json_encode({'status': 400, 'msg': '无效的请求'}))
+                return self.write(json_encode({'status': 500, 'msg': '操作失败！'}))
+        return self.write(json_encode({'status': 400, 'msg': '无效的请求'}))
 
 
 class UnLikeHandler(BaseHandler):
     @coroutine
     def post(self):
         user = self.current_user
-        wei_id = self.get_argument('id')
-        if user and wei_id:
-            result = yield twitter.unlike_this_msg(user.c_twi_token, user.c_twi_secret, msg_id=wei_id)
+        twi_id = self.get_argument('id')
+        if user and twi_id:
+            result = yield twitter.unlike_this_msg(user.c_twi_token, user.c_twi_secret, msg_id=twi_id)
             if result is False:
-                self.write(json_encode({'status': 200, 'msg': ''}))
+                cache = yield self.cache.get('twitter')
+                if cache:
+                    liked_msg = [msg for msg in cache if msg['id'] == twi_id][0]
+                    liked_msg['liked'] = False
+                    self.cache.set(ttl=0, twitter=cache)
+                return self.write(json_encode({'status': 200, 'msg': ''}))
             else:
-                self.write(json_encode({'status': 500, 'msg': '操作失败！'}))
-        self.write(json_encode({'status': 400, 'msg': '无效的请求'}))
-
-
-class ReplyHandler(BaseHandler):
-    @coroutine
-    def post(self):
-        user = self.current_user
-
-
-class ReWeiHandler(BaseHandler):
-    pass
+                return self.write(json_encode({'status': 500, 'msg': '操作失败！'}))
+        return self.write(json_encode({'status': 400, 'msg': '无效的请求'}))
 
 
 handlers = [
     (r"/twitter/like_msg", LikeHandler),
     (r"/twitter/unlike_msg", UnLikeHandler),
-    (r"/twitter/reply", ReplyHandler),
-    (r"/twitter/retw", ReWeiHandler),
 ]
 
 # todo: session expire mechanism

@@ -67,15 +67,12 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
 function set_type_specific_attrs(msg_item, item, max_width) {
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
     msg_item.attr('class', 'container cls-message-items from-' + item.type);
-    msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
-
-    var reply_div_id = "id-reply-" + item.type + "-" + item.id;
-    msg_item.find('.cls-message-reply').attr('id', reply_div_id).css('max-width', max_width);
-    msg_item.find('.cls-reply-msg').attr('data-target', '#' + reply_div_id);
-
-    var retw_div_id = "id-retw-" + item.type + "-" + item.id;
-    msg_item.find('.cls-message-retw').attr('id', retw_div_id);
-    msg_item.find('.cls-retw-msg').attr('data-target', '#' + retw_div_id)
+    if (item.type != 'weibo') {
+        msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
+    }
+    else {
+        msg_item.find('.cls-like-msg').remove();
+    }
 }
 
 function set_imgs_style(msg_item, item, max_width, max_height) {
@@ -328,6 +325,7 @@ function like_or_unlike_msg(msg) {
     if (liked == 'false') {
         temporally_like_action(msg, 'like');
         $.post($SCRIPT_ROOT + type + '/like_msg', data, function (data) {
+            data = parseJSON(data);
             if (data.status != 200) {
                 roll_back_like_action(msg, 'like')
             }
@@ -336,6 +334,7 @@ function like_or_unlike_msg(msg) {
     else {
         temporally_like_action(msg, 'unlike');
         $.post($SCRIPT_ROOT + type + '/unlike_msg', data, function (data) {
+            data = parseJSON(data);
             if (data.status != 200) {
                 roll_back_like_action(msg, 'unlike')
             }
@@ -366,10 +365,6 @@ function roll_back_like_action(msg, prev_action) {
         new_cls = cls.replace('liked-false', 'liked-true')
     }
     msg.find('.cls-like-msg').attr('class', new_cls);
-}
-
-function dropdown_reply_list(msg) {
-
 }
 
 function get_xsrf() {

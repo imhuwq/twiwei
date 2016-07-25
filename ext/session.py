@@ -84,7 +84,7 @@ class Cache:
         return items.get(type, [])
 
     @tornado.gen.coroutine
-    def set(self, is_anonymous=False, **kwargs):
+    def set(self, is_anonymous=False, ttl=180, **kwargs):
         if kwargs:
             if not is_anonymous:
                 key = 'cache_%s' % self.handler.user_id
@@ -93,7 +93,10 @@ class Cache:
             items = yield self.get_all(is_anonymous)
             items.update(**kwargs)
             new_items = json.dumps(items)
-            yield self.client.call("set", key, new_items, 'ex', 180)
+            if ttl == 0:
+                ttl = yield self.client.call('ttl', key)
+                ttl += 3
+            yield self.client.call("set", key, new_items, 'ex', ttl)
 
     @tornado.gen.coroutine
     def add(self, type, value):

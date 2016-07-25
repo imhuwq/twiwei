@@ -148,7 +148,6 @@ class Twitter(object):
     def like_this_msg(self, token, token_secret, msg_id):
         request = self.gen_request('POST', self.like_msg_url, resource_owner_key=token,
                                    resource_owner_secret=token_secret, id=msg_id)
-        print(request.url)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response.get('favorited')
