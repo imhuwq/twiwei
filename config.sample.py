@@ -1,31 +1,35 @@
 import random
 import os
 
-chars = 'abcdefghijklmnopqrstuvwxyz' \
+CHARS = 'abcdefghijklmnopqrstuvwxyz' \
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ' \
         '0123456789~!@#$%^&*(-_+)='
 
-SECRET_COOKIE = ''.join([x for x in random.SystemRandom().choice(chars) for _ in range(60)])
+SECRET_COOKIE = ''.join([x for x in random.SystemRandom().choice(CHARS) for _ in range(60)])
 
-db_config = {
+DB_CONFIG = {
     'username': 'twiwei',
     'password': 'twiwei',
     'database': 'twiwei',
     'host': 'localhost',
     'port': 5432
 }
-db_uri = 'postgresql+psycopg2://%s:%s@%s:%d/%s' % (db_config.get('username'),
-                                                   db_config.get('password'),
-                                                   db_config.get('host'),
-                                                   db_config.get('port'),
-                                                   db_config.get('database'))
+DB_URI = 'postgresql+psycopg2://%s:%s@%s:%d/%s' % (DB_CONFIG.get('username'),
+                                                   DB_CONFIG.get('password'),
+                                                   DB_CONFIG.get('host'),
+                                                   DB_CONFIG.get('port'),
+                                                   DB_CONFIG.get('database'))
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 settings = {
     "cookie_secret": SECRET_COOKIE,
     "xsrf_cookies": True,
-    'login_url': '/login'
+    'login_url': '/login',
+    'template_path': BASE_DIR + '/app/templates/',
+    'static_path': BASE_DIR + '/app/static'
 }
 
-base_dir = os.path.abspath(os.path.dirname(__file__))
+USE_PROXY = True
 
 WEI_CLIENT_ID = ''
 WEI_CLIENT_SECRET = ''
@@ -34,3 +38,5 @@ TWI_CLIENT_SECRET = ''
 WEI_ADMIN_TOKEN = ''
 TWI_ADMIN_TOKEN = ''
 TWI_ADMIN_TOKEN_SECRET = ''
+
+

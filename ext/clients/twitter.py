@@ -6,11 +6,10 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.httputil import url_concat
 from tornado.gen import coroutine
 import pycurl
-import requests
 from requests import Request
 from requests_oauthlib import OAuth1
 
-from config import TWI_ADMIN_TOKEN_SECRET, TWI_ADMIN_TOKEN, TWI_CLIENT_ID, TWI_CLIENT_SECRET
+from config import TWI_ADMIN_TOKEN_SECRET, TWI_ADMIN_TOKEN, TWI_CLIENT_ID, TWI_CLIENT_SECRET, USE_PROXY
 
 
 class Twitter(object):
@@ -63,7 +62,7 @@ class Twitter(object):
                     resource_owner_key=None,
                     resource_owner_secret=None,
                     callback_uri=None, verifier=None,
-                    use_proxy=True, **kwargs):
+                    use_proxy=USE_PROXY, **kwargs):
         if kwargs:
             url = url_concat(url, kwargs)
         headers = self.get_oauth_headers(method, url,
