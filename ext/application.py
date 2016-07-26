@@ -27,7 +27,6 @@ class BaseHandler(RequestHandler):
         self.query = self.application.db.session.query
         self.session = Session(self)
         self.cache = Cache(self)
-        self.sessions = dict()
 
         self.user_id = None
 
@@ -38,8 +37,6 @@ class BaseHandler(RequestHandler):
             self.user_id = user_id.decode()
         else:
             self.set_random_user_cookie()
-
-        self.sessions = yield self.session.get_all()
 
     def set_random_user_cookie(self):
         self.user_id = str(uuid.uuid4().int)

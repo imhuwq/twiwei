@@ -40,12 +40,13 @@ class Session:
 
     @tornado.gen.coroutine
     def set(self, **kwargs):
-        self.handler.sessions.update(**kwargs)
+        """ session 默认的 TTL 是 1 天 """
         new_items = json.dumps(self.handler.sessions)
-        yield self.client.call("set", 'session_%s' % self.handler.user_id, new_items)
+        yield self.client.call("set", 'session_%s' % self.handler.user_id, new_items, 'ex', 79200)
 
     @tornado.gen.coroutine
     def rename(self, new_key):
+        """ 用户登陆后， 将未登录时的 session 数据转移到用户的 session 中"""
         items = yield self.get(self.handler.user_id)
         if items:
             self.handler.sessions = items
@@ -53,6 +54,7 @@ class Session:
 
     @tornado.gen.coroutine
     def delete(self):
+        """ 用户注销后， 删除所有 session 数据 """
         self.handler.sessions = dict()
         yield self.client.call("del", 'session_%s' % self.handler.user_id)
 
@@ -79,12 +81,14 @@ class Cache:
         return dict()
 
     @tornado.gen.coroutine
-    def get(self, type, is_anonymous=False):
+    def get(self, key, is_anonymous=False):
         items = yield self.get_all(is_anonymous)
-        return items.get(type, [])
+        return items.get(key, [])
 
     @tornado.gen.coroutine
     def set(self, is_anonymous=False, ttl=180, **kwargs):
+        """因为在 redis 中使用 set 命令时会覆盖原有 TTL
+           所以可以在更新时指定 TTL=0， 这样会在原有时间上加 1 秒"""
         if kwargs:
             if not is_anonymous:
                 key = 'cache_%s' % self.handler.user_id
@@ -95,7 +99,7 @@ class Cache:
             new_items = json.dumps(items)
             if ttl == 0:
                 ttl = yield self.client.call('ttl', key)
-                ttl += 3
+                ttl += 1
             yield self.client.call("set", key, new_items, 'ex', ttl)
 
     @tornado.gen.coroutine
