@@ -33,7 +33,7 @@ class Session:
 
     @tornado.gen.coroutine
     def get(self, key):
-        items = yield self.get_all()
+        items = self.handler.sessions
         if items:
             return items.get(key)
         return None
@@ -41,6 +41,7 @@ class Session:
     @tornado.gen.coroutine
     def set(self, **kwargs):
         """ session 默认的 TTL 是 1 天 """
+        self.handler.sessions.update(kwargs)
         new_items = json.dumps(self.handler.sessions)
         yield self.client.call("set", 'session_%s' % self.handler.user_id, new_items, 'ex', 79200)
 

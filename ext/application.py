@@ -29,6 +29,7 @@ class BaseHandler(RequestHandler):
         self.cache = Cache(self)
 
         self.user_id = None
+        self.sessions = dict()
 
     @coroutine
     def prepare(self):
@@ -37,6 +38,8 @@ class BaseHandler(RequestHandler):
             self.user_id = user_id.decode()
         else:
             self.set_random_user_cookie()
+
+        self.sessions = yield self.session.get_all()
 
     def set_random_user_cookie(self):
         self.user_id = str(uuid.uuid4().int)
