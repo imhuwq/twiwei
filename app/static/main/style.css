@@ -3,6 +3,7 @@
 ************************************************/
 body {
     background-color: rgb(240, 240, 240);
+    border-radius: 0;
 }
 
 #id-top-nav {

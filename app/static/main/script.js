@@ -193,7 +193,7 @@ function request_statuses(url) {
         data = $.parseJSON(data);
         if (data.status == 200) {
             var statuses = data.content;
-            var last_status = $('.cls-message-items').eq(-1);
+            var last_status = $('.cls-message-items').eq(0);
             append_messages_list(statuses, last_status);
         }
         else {
