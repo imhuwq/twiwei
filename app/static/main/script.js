@@ -91,7 +91,7 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
         $.each(item.imgs, function (index, img) {
             cls = "cls-img-wrapper img_1_0";
             style = "width:" + max_width + "px;max-height:" + max_height * 0.60 + "px;";
-            create_new_img(cls, style, img, new_imgs)
+            create_new_img(cls, style, img, new_imgs, true)
         });
     }
     else if (imgs.length == 2) {
@@ -143,7 +143,7 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
 
 // 创建新的图片元素， 插入到每个消息的图片容器中
 //    该函数被 set_img_style 调用
-function create_new_img(cls, style, img_object, imgs_container) {
+function create_new_img(cls, style, img_object, imgs_container, is_single_img) {
     var new_img_wrapper = $('<div/>', {
         class: cls,
         style: style
@@ -155,7 +155,10 @@ function create_new_img(cls, style, img_object, imgs_container) {
     }).one("load", function () { //以下部分是根据图片的长和宽自适应 img_wrapper
         var width = $(this).width();
         var height = $(this).height();
-        if (width >= height > 0) {
+        if (is_single_img == true) {
+            $(this).css("width", "100%")
+        }
+        else if (width >= height > 0) {
             $(this).css("height", "100%")
         }
         else if (0 < width < height) {
@@ -165,7 +168,10 @@ function create_new_img(cls, style, img_object, imgs_container) {
         if (this.complete) {
             var width = $(this).naturalWidth;
             var height = $(this).naturalHeight;
-            if (width >= height > 0) {
+            if (is_single_img == true) {
+                $(this).css("width", "100%")
+            }
+            else if (width >= height > 0) {
                 alert('w>h');
                 $(this).css("width", "auto");
                 $(this).css("height", "100%")
@@ -224,8 +230,8 @@ function register_gallery() {
     function changeImgSize() {
         var img = this.content.find('img');
         var height = img[0].naturalHeight;
-        var window_height = $(window).height();
-        if (height > window_height * 2) {
+        var width = img[0].naturalWidth;
+        if (height > width * 2) {
             img.css('max-height', '100%');
             img.css('width', 'auto');
             img.css('max-width', 'auto');
