@@ -18,7 +18,6 @@ class Tornado(Application):
         # cookie中只保存 user_id， 其余信息都保存在 redis
         self.session = None
 
-
 class BaseHandler(RequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

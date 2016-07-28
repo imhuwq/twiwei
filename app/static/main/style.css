@@ -86,8 +86,6 @@ body {
 }
 
 .cls-img-wrapper img {
-    width: 100%;
-    min-height: 100%;
     cursor: pointer;
     padding: 0;
     border-radius: 5px;

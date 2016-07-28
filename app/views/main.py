@@ -7,7 +7,7 @@ from dateutil import parser
 
 from ext.application import BaseHandler
 from ext.clients import Twitter, Weibo
-from ..models.main import User
+from app.models.main import User
 
 weibo = Weibo()
 twitter = Twitter()

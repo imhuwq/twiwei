@@ -90,15 +90,8 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
     if (imgs.length == 1) {
         $.each(item.imgs, function (index, img) {
             cls = "cls-img-wrapper img_1_0";
-            $('<div/>',
-                {
-                    class: cls,
-                    style: "width:" + max_width + "px;max-height:" + max_height * 0.60 + "px;"
-                }).append($('<img/>', {
-                src: img.middl,
-                class: "cls-img-middl",
-                href: img.middl
-            })).appendTo(new_imgs)
+            style = "width:" + max_width + "px;max-height:" + max_height * 0.60 + "px;";
+            create_new_img(cls, style, img, new_imgs)
         });
     }
     else if (imgs.length == 2) {
@@ -109,16 +102,8 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
             else {
                 cls = "cls-img-wrapper img_1_1-r";
             }
-            $('<div/>',
-                {
-                    class: cls,
-                    style: "width:" + max_width * 0.48 + "px;height:" + max_height * 0.48 + "px;"
-                }
-            ).append($('<img/>', {
-                src: img.middl,
-                class: "cls-img-middl",
-                href: img.middl
-            })).appendTo(new_imgs)
+            style = "width:" + max_width * 0.48 + "px;height:" + max_height * 0.48 + "px;";
+            create_new_img(cls, style, img, new_imgs)
         });
     }
     else if (imgs.length == 3) {
@@ -131,64 +116,54 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
                 cls = "cls-img-wrapper img_1_2_r";
                 style = "width:" + max_width * 0.32 + "px;height:" + max_height * 0.32 + "px;"
             }
-            $('<div/>',
-                {
-                    class: cls,
-                    style: style
-                }
-            ).append($('<img/>', {
-                src: img.middl,
-                class: "cls-img-middl",
-                href: img.middl
-            })).appendTo(new_imgs)
+            create_new_img(cls, style, img, new_imgs)
         });
     }
     else if (imgs.length > 3) {
         $.each(item.imgs, function (index, img) {
             if (index == 0) {
-                cls = "cls-img-wrapper img_1_2_l";
+                cls = "cls-img-wrapper img_1_3_l";
                 style = "width:" + max_width * 0.72 + "px;height:" + max_height * 0.72 + "px;";
-                $('<div/>',
-                    {
-                        class: cls,
-                        style: style
-                    }
-                ).append($('<img/>', {
-                    src: img.middl,
-                    class: "cls-img-middl",
-                    href: img.middl
-                })).appendTo(new_imgs)
+                create_new_img(cls, style, img, new_imgs)
             }
             else if (index <= 3) {
-                cls = "cls-img-wrapper img_1_2_r";
+                cls = "cls-img-wrapper img_1_3_r";
                 style = "width:" + max_width * 0.24 + "px;height:" + max_height * 0.24 + "px;";
-                $('<div/>',
-                    {
-                        class: cls,
-                        style: style
-                    }
-                ).append($('<img/>', {
-                    src: img.middl,
-                    class: "cls-img-middl",
-                    href: img.middl
-                })).appendTo(new_imgs)
+                create_new_img(cls, style, img, new_imgs)
             }
             else {
-                $('<div/>',
-                    {
-                        style: "display:none"
-                    }
-                ).append($('<img/>', {
-                    src: img.middl,
-                    class: "cls-img-middl",
-                    href: img.middl
-                })).appendTo(new_imgs)
+                cls = "cls-img-wrapper img_1_3_h";
+                style = "display:none";
+                create_new_img(cls, style, img, new_imgs)
             }
-
         });
     }
-
     new_imgs.appendTo(msg_item.find('.cls-message-content'));
+}
+
+function create_new_img(cls, style, img_object, imgs_container) {
+    var new_img_wrapper = $('<div/>', {
+        class: cls,
+        style: style
+    });
+    var new_img = $('<img/>', {
+        class: "cls-img-middl",
+        href: img_object.middl,
+        src: img_object.middl
+    }).one("load", function () {
+        var width = $(this).width();
+        var height = $(this).height();
+        if (width >= height > 0) {
+            $(this).css("height", "100%")
+        }
+        else if (0 < width < height) {
+            $(this).css("width", "100%")
+        }
+    }).each(function () {
+        if (this.complete) $(this).load();
+    });
+    new_img.appendTo(new_img_wrapper);
+    new_img_wrapper.appendTo(imgs_container)
 }
 
 function request_statuses(url) {
@@ -255,7 +230,7 @@ function focus_mode(selector, on, out, dynamic) {
         });
     }
     else {
-        body = $("body");
+        var body = $("body");
         body.on("mouseover", selector, function () {
             $(this).css("opacity", on)
         });
