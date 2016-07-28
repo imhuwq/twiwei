@@ -9,10 +9,6 @@ $(document).ready(function () {
 
         focus_mode(".cls-img-wrapper img", 0.7, 1, true);
 
-        $(window).on("resize", function () {
-            resize_imgs();
-        });
-
         var msg_list = $("#id-message-list");
         msg_list.on("click", ".cls-like-msg", function () {
             var msg = $(this).parents('.cls-message-items');
@@ -40,6 +36,7 @@ $(document).ready(function () {
 });
 
 
+// 根据 json 来添加时间线消息
 function append_messages_list(statuses, status_template) {
     $.each(statuses, function (index, item) {
         var msg_item = status_template.clone();
@@ -54,6 +51,7 @@ function append_messages_list(statuses, status_template) {
     register_gallery();
 }
 
+// 设置消息的通用属性
 function set_general_attrs(msg_item, item, max_width, max_height) {
     msg_item.css("display", "block");
     msg_item.find('.cls-user-thumbnail').find('img').attr('src', item.profile);
@@ -64,6 +62,7 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
     msg_item.find('.cls-message-text').css("width", max_width);
 }
 
+// 设置消息的独特属性， 根据消息的来源和id而变化
 function set_type_specific_attrs(msg_item, item, max_width) {
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
     msg_item.attr('class', 'container cls-message-items from-' + item.type);
@@ -75,6 +74,7 @@ function set_type_specific_attrs(msg_item, item, max_width) {
     }
 }
 
+// 设置消息的图片风格, 根据图片的数量而变化
 function set_imgs_style(msg_item, item, max_width, max_height) {
     var imgs = msg_item.find('.cls-message-img');
     if (imgs) {
@@ -141,6 +141,8 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
     new_imgs.appendTo(msg_item.find('.cls-message-content'));
 }
 
+// 创建新的图片元素， 插入到每个消息的图片容器中
+//    该函数被 set_img_style 调用
 function create_new_img(cls, style, img_object, imgs_container) {
     var new_img_wrapper = $('<div/>', {
         class: cls,
@@ -150,7 +152,7 @@ function create_new_img(cls, style, img_object, imgs_container) {
         class: "cls-img-middl",
         href: img_object.middl,
         src: img_object.middl
-    }).one("load", function () {
+    }).one("load", function () { //以下部分是根据图片的长和宽自适应 img_wrapper
         var width = $(this).width();
         var height = $(this).height();
         if (width >= height > 0) {
@@ -160,12 +162,26 @@ function create_new_img(cls, style, img_object, imgs_container) {
             $(this).css("width", "100%")
         }
     }).each(function () {
-        if (this.complete) $(this).load();
+        if (this.complete) {
+            var width = $(this).naturalWidth;
+            var height = $(this).naturalHeight;
+            if (width >= height > 0) {
+                alert('w>h');
+                $(this).css("width", "auto");
+                $(this).css("height", "100%")
+            }
+            else if (0 < width < height) {
+                alert('w<h');
+                $(this).css("height", "auto");
+                $(this).css("width", "100%")
+            }
+        }
     });
     new_img.appendTo(new_img_wrapper);
     new_img_wrapper.appendTo(imgs_container)
 }
 
+// 向特定 url 通过 ajax 请求时间线消息的 json 数据
 function request_statuses(url) {
     $.get($SCRIPT_ROOT + url, {}, function (data) {
         data = $.parseJSON(data);
@@ -182,42 +198,6 @@ function request_statuses(url) {
 
 function load_home(url) {
     request_statuses(url)
-}
-
-function resize_imgs() {
-    var max_width, max_height = $(".cls-message-items").eq(0).width() * 0.8;
-
-    var img_1_0 = $(".img_1_0");
-    var img_1_1 = $(".img_1_1");
-    var img_1_2_l = $(".img_1_2_l");
-    var img_1_2_r = $(".img_1_2_r");
-    var img_1_3_l = $(".img_1_3_l");
-    var img_1_3_r = $(".img_1_3_r");
-
-    $.each(img_1_0, function (index, item) {
-        $(this).css("width", max_width, "max-height", max_height * 0.6)
-    });
-    $.each(img_1_1, function (index, item) {
-        var side_length = max_width * 0.48;
-        $(this).css("width", side_length, "height", side_length);
-    });
-
-    $.each(img_1_2_l, function (index, item) {
-        var side_length = max_width * 0.64;
-        $(this).css("width", side_length, "height", side_length);
-    });
-    $.each(img_1_2_r, function (index, item) {
-        var side_length = max_width * 0.32;
-        $(this).css("width", side_length, "height", side_length);
-    });
-    $.each(img_1_3_l, function (index, item) {
-        var side_length = max_width * 0.72;
-        $(this).css("width", side_length, "height", side_length);
-    });
-    $.each(img_1_3_r, function (index, item) {
-        var side_length = max_width * 0.24;
-        $(this).css("width", side_length, "height", side_length);
-    });
 }
 
 function focus_mode(selector, on, out, dynamic) {
@@ -241,6 +221,17 @@ function focus_mode(selector, on, out, dynamic) {
 }
 
 function register_gallery() {
+    function changeImgSize() {
+        var img = this.content.find('img');
+        var height = img[0].naturalHeight;
+        var window_height = $(window).height();
+        if (height > window_height * 2) {
+            img.css('max-height', '100%');
+            img.css('width', 'auto');
+            img.css('max-width', 'auto');
+        }
+    }
+
     $(".cls-message-img").each(function () {
         $(this).magnificPopup({
             delegate: '.cls-img-middl',
@@ -270,15 +261,9 @@ function register_gallery() {
             },
             callbacks: {
                 elementParse: function (item) {
-                    if (item.el.height() > $(window).height() * 1.5) {
-                        item.el.css("max-height", item.el.height() + '! important;');
-                    }
-                    else {
-                        item.el.css("max-height", $(window).height() + '! important;');
-                    }
-
                     item.src = item.src.replace(/\/bmiddle\//, '/large/');
-                }
+                },
+                imageLoadComplete: changeImgSize
             }
         })
     });
