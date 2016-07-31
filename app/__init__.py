@@ -30,8 +30,7 @@ def create_app(mode='develop'):
             debug=True,
             **settings
         )
-        db_name = 'develop.sqlite'
-        app.db_uri = 'sqlite:///' + os.path.join(BASE_DIR, db_name)
+        app.db_uri = DB_URI
     elif mode == 'test':
         app = Tornado(
             handlers=handlers,

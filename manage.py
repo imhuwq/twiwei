@@ -13,7 +13,6 @@ if __name__ == "__main__":
     mode = tornado.options.options.mode
     port = tornado.options.options.port
     app = create_app(mode)
-    app = app
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(8000)
     print('开始以 %s 模式在 %d 端口运行 Tornado 服务...' % (mode, port))
