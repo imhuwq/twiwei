@@ -14,7 +14,6 @@
             <span class="cls-message-info">
                 <span class="cls-user-name">#</span>
                 <span class="cls-message-time">#</span>
-                <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-heart cls-like-msg" title="喜欢"></span>
             </span>
 
             <div class="cls-user-message">
@@ -27,6 +26,40 @@
                         </div>
 
                     </div>
+                </div>
+
+                <div class="cls-message-action">
+                    <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-retweet cls-retw-msg" title="转发"
+                          data-toggle="modal" data-target="#id-retw-weibo-1234567"></span>
+                    <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-heart cls-like-msg" title="喜欢"></span>
+                    <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-share-alt cls-reply-msg" title="评论"
+                          data-toggle="collapse" data-target="#id-reply-wei-1234567"></span>
+                </div>
+
+                <div class="modal fade cls-message-retw" id="id-retw-weibo-1234567" tabindex="-1" role="dialog"
+                     aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                ...
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary">转发</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="collapse cls-message-reply" id="id-reply-weibo-1234567">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                        <span class="input-group-addon">reply</span>
+                    </div>
+
+                    <ul>
+                    </ul>
                 </div>
 
 

@@ -66,12 +66,16 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
 function set_type_specific_attrs(msg_item, item, max_width) {
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
     msg_item.attr('class', 'container cls-message-items from-' + item.type);
-    if (item.type != 'weibo') {
-        msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
-    }
-    else {
-        msg_item.find('.cls-like-msg').remove();
-    }
+
+    msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
+
+    var reply_div_id = "id-reply-" + item.type + "-" + item.id;
+    msg_item.find('.cls-message-reply').attr('id', reply_div_id).css('max-width', max_width);
+    msg_item.find('.cls-reply-msg').attr('data-target', '#' + reply_div_id);
+
+    var retw_div_id = "id-retw-" + item.type + "-" + item.id;
+    msg_item.find('.cls-message-retw').attr('id', retw_div_id);
+    msg_item.find('.cls-retw-msg').attr('data-target', '#' + retw_div_id)
 }
 
 // 设置消息的图片风格, 根据图片的数量而变化
@@ -291,7 +295,7 @@ function like_or_unlike_msg(msg) {
     if (liked == 'false') {
         temporally_like_action(msg, 'like');
         $.post($SCRIPT_ROOT + type + '/like_msg', data, function (data) {
-            data = parseJSON(data);
+            data = $.parseJSON(data);
             if (data.status != 200) {
                 roll_back_like_action(msg, 'like')
             }
@@ -300,7 +304,7 @@ function like_or_unlike_msg(msg) {
     else {
         temporally_like_action(msg, 'unlike');
         $.post($SCRIPT_ROOT + type + '/unlike_msg', data, function (data) {
-            data = parseJSON(data);
+            data = $.parseJSON(data);
             if (data.status != 200) {
                 roll_back_like_action(msg, 'unlike')
             }
