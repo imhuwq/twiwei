@@ -1,9 +1,10 @@
 import os
 
-from ext.database import SQLAlchemy
-from ext.session import SessionManager
-from ext.application import Tornado
+from tornado.web import Application
 
+from ext.database import db
+from ext.session import session
+from app.models.main import User
 from config import settings, DB_URI, BASE_DIR
 from app.views import handlers
 
@@ -13,8 +14,17 @@ class ConfigurationError(BaseException):
         super().__init__(*args, **kwargs)
 
 
-session = SessionManager()
-db = SQLAlchemy()
+class Tornado(Application):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # 与 SQLAlchemy 的连接， 用于数据库操作
+        self.db = None
+        self.db_uri = None
+
+        # 与 redis 的连接， 用于session缓存
+        # cookie中只保存 user_id， 其余信息都保存在 redis
+        self.session = None
 
 
 def create_app(mode='develop'):
