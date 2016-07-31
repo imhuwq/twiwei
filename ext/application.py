@@ -3,7 +3,7 @@ import uuid
 from tornado.gen import coroutine
 from tornado.web import Application, RequestHandler
 
-from .session import Session, Cache
+from ext.session import Session, Cache
 from app.models.main import User
 
 
@@ -13,10 +13,12 @@ class Tornado(Application):
 
         # 与 SQLAlchemy 的连接， 用于数据库操作
         self.db = None
+        self.db_uri = None
 
         # 与 redis 的连接， 用于session缓存
         # cookie中只保存 user_id， 其余信息都保存在 redis
         self.session = None
+
 
 class BaseHandler(RequestHandler):
     def __init__(self, *args, **kwargs):

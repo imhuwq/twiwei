@@ -3,3 +3,5 @@ env
 te.py
 .idea
 config.py
+develop.sqlite
+test.sqlite

@@ -1,9 +1,10 @@
-from sqlalchemy import Column, String, Integer, BigInteger, DateTime
+from sqlalchemy import Column, String, BigInteger, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 
-from app import db
+Model = declarative_base()
 
 
-class User(db.Model):
+class User(Model):
     __tablename__ = "users"
 
     c_id = Column("id", BigInteger, primary_key=True)
