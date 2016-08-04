@@ -202,7 +202,7 @@ class WeiboCallbackHandler(BaseHandler):
                 User.merge_user(old_user, user, update_fields)
             else:
                 user.update_fields(update_fields)
-            return self.redirect('/account')
+            return self.redirect('/account/')
 
         # 用户没有登陆， 说明是直接用微博账户登录
         else:

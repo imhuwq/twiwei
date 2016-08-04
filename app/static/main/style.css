@@ -105,6 +105,7 @@ body {
     cursor: pointer;
 
 }
+
 .cls-message-reply .input-group {
     margin-bottom: 1em;
 }
@@ -126,6 +127,17 @@ body {
 .cls-message-reply li {
     border-bottom: 1px solid rgb(204, 204, 204);
     list-style-type: none;
+}
+
+.cls-message-retw .modal-content {
+    border-radius: 0;
+}
+
+.cls-retw-modal-confirm, .cls-retw-modal-cancel {
+    background: none;
+    border-radius: 0;
+    border: 1px solid rgb(225, 225, 225);
+    color: rgb(100, 100, 100);
 }
 
 .is-liked-false {
