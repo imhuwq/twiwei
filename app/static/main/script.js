@@ -16,6 +16,13 @@ $(document).ready(function () {
         });
 
         $('.image-link').magnificPopup({type: 'image'});
+
+        msg_list.on('click', '.cls-retw-msg', function () {
+            var retw_box = $(this).parent().parent().find('.cls-message-retw');
+            var box_height = retw_box.height();
+            var window_height = $(window).height();
+            retw_box.css('margin-top', (window_height - box_height) / 2 + 10)
+        })
     }
 
     if (window.location.pathname == '/login') {
@@ -31,7 +38,6 @@ $(document).ready(function () {
         });
         focus_mode("#id-login-by-twi", 1, 0.5)
     }
-
 
 });
 
