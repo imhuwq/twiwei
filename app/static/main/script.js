@@ -18,10 +18,12 @@ $(document).ready(function () {
         $('.image-link').magnificPopup({type: 'image'});
 
         msg_list.on('click', '.cls-retw-msg', function () {
-            var retw_box = $(this).parent().parent().find('.cls-message-retw');
-            var box_height = retw_box.height();
+            var msg_box = $(this).parent().parent();
+            var box_height = msg_box.height();
             var window_height = $(window).height();
-            retw_box.css('margin-top', (window_height - box_height) / 2 + 10)
+            var margin_top = (window_height - box_height)/3;
+            var retw_box = msg_box.find('.cls-message-retw');
+            retw_box.css('margin-top', margin_top)
         })
     }
 
