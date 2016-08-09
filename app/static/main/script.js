@@ -21,9 +21,32 @@ $(document).ready(function () {
             var msg_box = $(this).parent().parent();
             var box_height = msg_box.height();
             var window_height = $(window).height();
-            var margin_top = (window_height - box_height)/3;
+            var margin_top = (window_height - box_height) / 3;
             var retw_box = msg_box.find('.cls-message-retw');
             retw_box.css('margin-top', margin_top)
+        });
+
+        msg_list.on('click', '.cls-retw-modal-confirm', function () {
+            var id = $(this).closest('.cls-message-retw').prop('id').split('-')[3];
+            var input_box = $(this).parent().siblings('.modal-body').children('input');
+            $.post($SCRIPT_ROOT + 'twitter/retw_msg',
+                {
+                    id: id,
+                    reply: input_box.prop('value').trim(),
+                    screen_name: $(this).parents('.cls-message-right').find('.cls-user-screen-name').text(),
+                    _xsrf: get_xsrf()
+                }, function (data) {
+                    data = $.parseJSON(data);
+                    if (data.status == 200) {
+                        window.location.replace('/')
+                    }
+                    else {
+                        alert(data.msg)
+                    }
+
+                });
+            input_box.prop('value', '');
+            $(this).siblings('.cls-retw-modal-cancel').trigger('click')
         })
     }
 
@@ -65,6 +88,7 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
     msg_item.find('.cls-user-thumbnail').find('img').attr('src', item.profile);
     msg_item.find('.cls-user-thumbnail').find('img').css("max-width", max_width * 0.1, "max-height", max_height * 0.1);
     msg_item.find('.cls-user-name').text(item.writer);
+    msg_item.find('.cls-user-screen-name').text(item.screen_name);
     msg_item.find('.cls-message-time').text(moment(item.time).fromNow());
     msg_item.find('.cls-message-text').text(item.text);
     msg_item.find('.cls-message-text').css("width", max_width);
@@ -184,12 +208,10 @@ function create_new_img(cls, style, img_object, imgs_container, is_single_img) {
                 $(this).css("width", "100%")
             }
             else if (width >= height > 0) {
-                alert('w>h');
                 $(this).css("width", "auto");
                 $(this).css("height", "100%")
             }
             else if (0 < width < height) {
-                alert('w<h');
                 $(this).css("height", "auto");
                 $(this).css("width", "100%")
             }

@@ -50,9 +50,31 @@ class UnLikeHandler(BaseHandler):
         return self.write(json_encode({'status': 400, 'msg': '无效的请求'}))
 
 
+class RetwMessageHandler(BaseHandler):
+    @coroutine
+    def post(self):
+        user = self.current_user
+        twi_id = self.get_argument('id')
+        screen_name = self.get_argument('screen_name')
+        reply = self.get_argument('reply')
+        if reply:
+            reply_text = 'RT @%s: %s' % (screen_name, reply)
+        else:
+            reply_text = 'RT @%s' % (screen_name)
+        if user and twi_id:
+            result = yield twitter.update_message(user.c_twi_token, user.c_twi_secret, msg_id=twi_id,
+                                                  reply_text=reply_text)
+            if result:
+                self.cache.clear()
+                return self.write(json_encode({'status': 200}))
+
+        return self.write(json_encode({'status': 500, 'msg': '操作失败'}))
+
+
 handlers = [
     (r"/twitter/like_msg", LikeHandler),
     (r"/twitter/unlike_msg", UnLikeHandler),
+    (r"/twitter/retw_msg", RetwMessageHandler)
 ]
 
 # todo: session expire mechanism

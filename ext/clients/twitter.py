@@ -30,6 +30,7 @@ class Twitter(object):
 
         self.like_msg_url = 'https://api.twitter.com/1.1/favorites/create.json'
         self.unlike_msg_url = 'https://api.twitter.com/1.1/favorites/destroy.json'
+        self.update_message_url = 'https://api.twitter.com/1.1/statuses/update.json'
 
         self.admin_token = TWI_ADMIN_TOKEN
         self.admin_token_secret = TWI_ADMIN_TOKEN_SECRET
@@ -124,6 +125,7 @@ class Twitter(object):
         for d in data:
             status = dict()
             status['writer'] = d.get('user').get('name')
+            status['screen_name'] = d.get('user').get('screen_name').strip()
             status['text'] = re.sub(r'https://t.co/.*', '', d.get('text', ''))
             status['profile'] = d.get('user').get('profile_image_url')
             status['time'] = datetime.strptime(d.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
@@ -158,3 +160,23 @@ class Twitter(object):
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response.get('favorited')
+
+    def retw_url(self, msg_id):
+        return 'https://api.twitter.com/1.1/statuses/retweet/%s.json' % msg_id
+
+    @coroutine
+    def retw_message(self, token, token_secret, msg_id):
+        request = self.gen_request('POST', self.retw_url(msg_id), resource_owner_key=token,
+                                   resource_owner_secret=token_secret, id=msg_id)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('retweeted', False)
+
+    @coroutine
+    def update_message(self, token, token_secret, msg_id, reply_text):
+        request = self.gen_request('POST', self.update_message_url, resource_owner_key=token,
+                                   resource_owner_secret=token_secret, status=reply_text,
+                                   in_reply_to_status_id=msg_id)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('in_reply_to_user_id_str', None)

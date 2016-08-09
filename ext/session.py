@@ -113,5 +113,10 @@ class Cache:
         ttl = yield self.client.call('ttl', key)
         yield self.client.call("set", key, new_items, 'ex', ttl + 10)
 
+    @tornado.gen.coroutine
+    def clear(self):
+        key = 'cache_%s' % self.handler.user_id
+        yield self.client.call('del', key)
+
 
 session = SessionManager()
