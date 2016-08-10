@@ -4,6 +4,7 @@ import json
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.httputil import url_concat
 from tornado.gen import coroutine
+from tornado.escape import url_escape
 
 from config import WEI_CLIENT_ID, WEI_CLIENT_SECRET, WEI_ADMIN_TOKEN
 
@@ -33,6 +34,7 @@ class Weibo(object):
         self.like_weibo_url = 'https://api.weibo.com/2/favorites/create.json'
         self.unlike_weibo_url = 'https://api.weibo.com/2/favorites/destroy.json'
         self.get_replies_url = 'https://api.weibo.com/2/comments/show.json'
+        self.repost_message_url = 'https://api.weibo.com/2/statuses/repost.json'
 
         # 用户信息相关 url
         self.user_info_url = 'https://api.weibo.com/2/users/show.json'
@@ -65,6 +67,7 @@ class Weibo(object):
 
             u = r_s.get('user')
             p_s['writer'] = u.get('name')
+            p_s['screen_name'] = u.get('screen_name')
             p_s['profile'] = u.get('profile_image_url')
             p_s['type'] = 'weibo'
             p_s['id'] = r_s.get('id')
@@ -191,3 +194,16 @@ class Weibo(object):
                                     wei_id=wei_id, since_id=since_id, max_id=max_id, **kwargs)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
+
+    @coroutine
+    def repost_message(self, access_token, wei_id, text):
+        params = {
+            'access_token': access_token,
+            'id': wei_id,
+            'status': text[:140],
+            'is_comment': 1
+        }
+        request = self.gen_requests('POST', self.repost_message_url, **params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('id', None)

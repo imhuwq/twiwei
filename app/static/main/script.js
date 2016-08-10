@@ -28,8 +28,15 @@ $(document).ready(function () {
 
         msg_list.on('click', '.cls-retw-modal-confirm', function () {
             var id = $(this).closest('.cls-message-retw').prop('id').split('-')[3];
+            var site = $(this).closest('.cls-message-retw').prop('id').split('-')[2];
+            if (site == 'weibo') {
+                site = 'weibo/retw_msg'
+            }
+            else {
+                site = 'twitter/retw_msg'
+            }
             var input_box = $(this).parent().siblings('.modal-body').children('input');
-            $.post($SCRIPT_ROOT + 'twitter/retw_msg',
+            $.post($SCRIPT_ROOT + site,
                 {
                     id: id,
                     reply: input_box.prop('value').trim(),

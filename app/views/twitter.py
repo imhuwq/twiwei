@@ -60,7 +60,7 @@ class RetwMessageHandler(BaseHandler):
         if reply:
             reply_text = 'RT @%s: %s' % (screen_name, reply)
         else:
-            reply_text = 'RT @%s' % (screen_name)
+            reply_text = 'RT @%s' % screen_name
         if user and twi_id:
             result = yield twitter.update_message(user.c_twi_token, user.c_twi_secret, msg_id=twi_id,
                                                   reply_text=reply_text)
