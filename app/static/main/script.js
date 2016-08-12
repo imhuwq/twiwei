@@ -54,6 +54,36 @@ $(document).ready(function () {
                 });
             input_box.prop('value', '');
             $(this).siblings('.cls-retw-modal-cancel').trigger('click')
+        });
+
+
+        msg_list.on('click', '.cls-reply-btn', function () {
+            var id = $(this).closest('.cls-message-reply').prop('id').split('-')[3];
+            var site = $(this).closest('.cls-message-reply').prop('id').split('-')[2];
+            if (site == 'weibo') {
+                site = 'weibo/reply_msg'
+            }
+            else {
+                site = 'twitter/reply_msg'
+            }
+
+            var input_box = $(this).siblings('.cls-reply-text');
+            $.post($SCRIPT_ROOT + site,
+                {
+                    id: id,
+                    reply: input_box.prop('value').trim(),
+                    _xsrf: get_xsrf()
+                }, function (data) {
+                    data = $.parseJSON(data);
+                    if (data.status == 200) {
+                        // window.location.replace('/')
+                    }
+                    else {
+                        alert(data.msg)
+                    }
+
+                });
+            input_box.prop('value', '');
         })
     }
 

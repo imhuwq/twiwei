@@ -35,6 +35,7 @@ class Weibo(object):
         self.unlike_weibo_url = 'https://api.weibo.com/2/favorites/destroy.json'
         self.get_replies_url = 'https://api.weibo.com/2/comments/show.json'
         self.repost_message_url = 'https://api.weibo.com/2/statuses/repost.json'
+        self.reply_message_url = 'https://api.weibo.com/2/comments/create.json'
 
         # 用户信息相关 url
         self.user_info_url = 'https://api.weibo.com/2/users/show.json'
@@ -204,6 +205,18 @@ class Weibo(object):
             'is_comment': 1
         }
         request = self.gen_requests('POST', self.repost_message_url, **params)
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('id', None)
+
+    @coroutine
+    def reply_message(self, access_token, wei_id, text):
+        params = {
+            'access_token': access_token,
+            'comment': text,
+            'id': wei_id
+        }
+        request = self.gen_requests('POST', self.reply_message_url, **params)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response.get('id', None)
