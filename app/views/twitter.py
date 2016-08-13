@@ -58,14 +58,32 @@ class RetwMessageHandler(BaseHandler):
         screen_name = self.get_argument('screen_name')
         reply = self.get_argument('reply')
         if reply:
-            reply_text = 'RT @%s: %s' % (screen_name, reply)
+            reply_text = 'RT @%s: %s https://twitter.com/%s/statuses/%s' % (screen_name, reply, screen_name, twi_id)
         else:
             reply_text = 'RT @%s' % screen_name
         if user and twi_id:
-            result = yield twitter.update_message(user.c_twi_token, user.c_twi_secret, msg_id=twi_id,
-                                                  reply_text=reply_text)
+            result = yield twitter.retw_with_comment(user.c_twi_token, user.c_twi_secret, reply_text)
+
             if result:
                 self.cache.clear()
+                return self.write(json_encode({'status': 200}))
+
+        return self.write(json_encode({'status': 500, 'msg': '操作失败'}))
+
+
+class ReplyMessageHandler(BaseHandler):
+    @coroutine
+    def post(self):
+        user = self.current_user
+        twi_id = self.get_argument('id')
+        screen_name = self.get_argument('screen_name')
+        reply = self.get_argument('reply')
+        reply_text = '@%s: %s' % (screen_name, reply)
+
+        if user and twi_id:
+            result = yield twitter.reply_message(user.c_twi_token, user.c_twi_secret, twi_id, reply_text)
+
+            if result:
                 return self.write(json_encode({'status': 200}))
 
         return self.write(json_encode({'status': 500, 'msg': '操作失败'}))
@@ -74,7 +92,8 @@ class RetwMessageHandler(BaseHandler):
 handlers = [
     (r"/twitter/like_msg", LikeHandler),
     (r"/twitter/unlike_msg", UnLikeHandler),
-    (r"/twitter/retw_msg", RetwMessageHandler)
+    (r"/twitter/retw_msg", RetwMessageHandler),
+    (r"/twitter/reply_msg", ReplyMessageHandler)
 ]
 
 # todo: session expire mechanism

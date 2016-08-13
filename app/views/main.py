@@ -79,6 +79,7 @@ class LoadMoreHandler(BaseHandler):
             if not data_wei:
                 data_wei = yield weibo.get_user_timeline(user.c_wei_token,
                                                          max_id=wei_max)
+                data_wei = data_wei[1:]
                 self.cache.add('weibo', data_wei)
             self.set_cookie('wei_max', str(data_wei[-1]['id']))
             statuses.extend(data_wei)
@@ -90,6 +91,7 @@ class LoadMoreHandler(BaseHandler):
                 data_twi = yield twitter.get_user_timeline(user.c_twi_token,
                                                            user.c_twi_secret,
                                                            max_id=twi_max)
+                data_twi = data_twi[1:]
                 self.cache.add('twitter', data_twi)
             self.set_cookie('twi_max', str(data_twi[-1]['id']))
             statuses.extend(data_twi)

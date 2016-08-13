@@ -165,7 +165,7 @@ class Twitter(object):
         return 'https://api.twitter.com/1.1/statuses/retweet/%s.json' % msg_id
 
     @coroutine
-    def retw_message(self, token, token_secret, msg_id):
+    def retw_without_comment(self, token, token_secret, msg_id):
         request = self.gen_request('POST', self.retw_url(msg_id), resource_owner_key=token,
                                    resource_owner_secret=token_secret, id=msg_id)
         response = yield self.client.fetch(request)
@@ -173,7 +173,16 @@ class Twitter(object):
         return response.get('retweeted', False)
 
     @coroutine
-    def update_message(self, token, token_secret, msg_id, reply_text):
+    def retw_with_comment(self, token, token_secret, reply_text):
+        request = self.gen_request('POST', self.update_message_url, resource_owner_key=token,
+                                   resource_owner_secret=token_secret, status=reply_text,
+                                   )
+        response = yield self.client.fetch(request)
+        response = json.loads(response.body.decode())
+        return response.get('created_at', None)
+
+    @coroutine
+    def reply_message(self, token, token_secret, msg_id, reply_text):
         request = self.gen_request('POST', self.update_message_url, resource_owner_key=token,
                                    resource_owner_secret=token_secret, status=reply_text,
                                    in_reply_to_status_id=msg_id)

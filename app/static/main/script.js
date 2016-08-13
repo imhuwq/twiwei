@@ -29,60 +29,71 @@ $(document).ready(function () {
         msg_list.on('click', '.cls-retw-modal-confirm', function () {
             var id = $(this).closest('.cls-message-retw').prop('id').split('-')[3];
             var site = $(this).closest('.cls-message-retw').prop('id').split('-')[2];
-            if (site == 'weibo') {
-                site = 'weibo/retw_msg'
-            }
-            else {
-                site = 'twitter/retw_msg'
-            }
             var input_box = $(this).parent().siblings('.modal-body').children('input');
-            $.post($SCRIPT_ROOT + site,
-                {
-                    id: id,
-                    reply: input_box.prop('value').trim(),
-                    screen_name: $(this).parents('.cls-message-right').find('.cls-user-screen-name').text(),
-                    _xsrf: get_xsrf()
-                }, function (data) {
-                    data = $.parseJSON(data);
-                    if (data.status == 200) {
-                        window.location.replace('/')
-                    }
-                    else {
-                        alert(data.msg)
-                    }
+            var reply_text = input_box.prop('value');
 
-                });
+            if (reply_text && reply_text.trim()) {
+
+                if (site == 'weibo') {
+                    site = 'weibo/retw_msg'
+                }
+                else {
+                    site = 'twitter/retw_msg'
+                }
+
+                $.post($SCRIPT_ROOT + site,
+                    {
+                        id: id,
+                        reply: reply_text,
+                        screen_name: $(this).parents('.cls-message-right').find('.cls-user-screen-name').text(),
+                        _xsrf: get_xsrf()
+                    }, function (data) {
+                        data = $.parseJSON(data);
+                        if (data.status == 200) {
+                            window.location.replace('/')
+                        }
+                        else {
+                            alert(data.msg)
+                        }
+
+                    });
+            }
             input_box.prop('value', '');
             $(this).siblings('.cls-retw-modal-cancel').trigger('click')
         });
 
-
         msg_list.on('click', '.cls-reply-btn', function () {
             var id = $(this).closest('.cls-message-reply').prop('id').split('-')[3];
             var site = $(this).closest('.cls-message-reply').prop('id').split('-')[2];
-            if (site == 'weibo') {
-                site = 'weibo/reply_msg'
-            }
-            else {
-                site = 'twitter/reply_msg'
-            }
+            var input_box = $(this).closest('.cls-message-right').find('.cls-reply-text');
+            var reply_text = input_box.prop('value');
+            var reply_btn = $(this).closest('.cls-message-right').find('.cls-reply-msg');
+            if (reply_text && reply_text.trim()) {
 
-            var input_box = $(this).siblings('.cls-reply-text');
-            $.post($SCRIPT_ROOT + site,
-                {
-                    id: id,
-                    reply: input_box.prop('value').trim(),
-                    _xsrf: get_xsrf()
-                }, function (data) {
-                    data = $.parseJSON(data);
-                    if (data.status == 200) {
-                        // window.location.replace('/')
-                    }
-                    else {
-                        alert(data.msg)
-                    }
+                if (site == 'weibo') {
+                    site = 'weibo/reply_msg'
+                }
+                else {
+                    site = 'twitter/reply_msg'
+                }
 
-                });
+                $.post($SCRIPT_ROOT + site,
+                    {
+                        id: id,
+                        reply: reply_text.trim(),
+                        screen_name: $(this).parents('.cls-message-right').find('.cls-user-screen-name').text(),
+                        _xsrf: get_xsrf()
+                    }, function (data) {
+                        data = $.parseJSON(data);
+                        if (data.status == 200) {
+                        }
+                        else {
+                            alert(data.msg)
+                        }
+
+                    });
+            }
+            reply_btn.trigger('click');
             input_box.prop('value', '');
         })
     }
