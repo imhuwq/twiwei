@@ -81,7 +81,7 @@ class LoadMoreHandler(BaseHandler):
                                                          max_id=wei_max)
                 data_wei = data_wei[1:]
                 self.cache.add('weibo', data_wei)
-            self.set_cookie('wei_max', str(data_wei[-1]['id']))
+                self.set_cookie('wei_max', str(data_wei[-1]['id']))
             statuses.extend(data_wei)
 
             twi_max = int(self.get_cookie('twi_max'))
@@ -93,7 +93,7 @@ class LoadMoreHandler(BaseHandler):
                                                            max_id=twi_max)
                 data_twi = data_twi[1:]
                 self.cache.add('twitter', data_twi)
-            self.set_cookie('twi_max', str(data_twi[-1]['id']))
+                self.set_cookie('twi_max', str(data_twi[-1]['id']))
             statuses.extend(data_twi)
 
             statuses = sorted(statuses, key=lambda s: parser.parse(s.get('time')), reverse=True)

@@ -118,13 +118,47 @@ $(document).ready(function () {
 // 根据 json 来添加时间线消息
 function append_messages_list(statuses, status_template) {
     $.each(statuses, function (index, item) {
-        var msg_item = status_template.clone();
-        var max_width = status_template.width() * 0.80;
-        var max_height = status_template.width() * 0.80;
+        function gen_ret_item(template, source) {
+            var ret_item = template.clone();
+            ret_item.find('.cls-message-action').remove();
+            ret_item.find('.cls-message-retw').remove();
+            ret_item.find('.cls-message-reply').remove();
 
-        set_general_attrs(msg_item, item, max_width, max_height);
-        set_type_specific_attrs(msg_item, item, max_width);
-        set_imgs_style(msg_item, item, max_width, max_height);
+            var max_width = template.width() * 0.70;
+            var max_height = template.width() * 0.70;
+            set_general_attrs(ret_item, source, max_width, max_height);
+            set_type_specific_attrs(ret_item, source, max_width);
+            set_imgs_style(ret_item, source, max_width * 0.95, max_height * 0.95);
+            ret_item.find('.cls-message-left').remove();
+            ret_item.find('.cls-message-right').attr('class', 'col-md-12 col-sm-12 col-xs-12 cls-message-right');
+            ret_item.find('.cls-message-target').css('width', max_width + 'px');
+
+            return ret_item
+        }
+
+        function gen_msg_item(template, source) {
+            var msg_item = template.clone();
+            var max_width = template.width() * 0.80;
+            var max_height = template.width() * 0.80;
+
+            set_general_attrs(msg_item, source, max_width, max_height);
+            set_type_specific_attrs(msg_item, source, max_width);
+            set_imgs_style(msg_item, source, max_width, max_height);
+
+            var retwed = item.retwed_msg;
+            if (retwed) {
+                msg_item.find('.cls-message-target').css('width', max_width - 10 + 'px');
+                var retwed_msg = msg_item.find('.cls-message-target');
+                var ret_item = gen_ret_item(template, retwed);
+                retwed_msg.append(ret_item)
+
+            }
+            return msg_item
+
+        }
+
+        var msg_item = gen_msg_item(status_template, item);
+
         msg_item.appendTo($('#id-message-list'))
     });
     register_gallery();

@@ -74,6 +74,17 @@ body {
     height: 100%;
 }
 
+.cls-message-target .cls-message-items {
+    background-color: rgb(245, 245, 245);
+    border-bottom: none;
+    padding-bottom: 5px;
+    border-radius: 5px;
+}
+
+.cls-message-target .cls-message-right {
+    padding-left: 0;
+}
+
 .cls-user-thumbnail img {
     min-width: 2.3em !important;
     min-height: 2.3em !important;

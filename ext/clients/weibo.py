@@ -49,31 +49,36 @@ class Weibo(object):
         raw_statuses = data.get('statuses', [])
         pro_statuses = []
         for r_s in raw_statuses:
-            p_s = dict()
+            def extract_r_s(r_s):
+                p_s = dict()
+                p_s['time'] = datetime.strptime(r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
+                p_s['text'] = r_s.get('text')
 
-            p_s['time'] = datetime.strptime(r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
-            p_s['text'] = r_s.get('text')
+                p_s['imgs'] = []
+                thumb_pics = r_s.get('pic_urls')
+                for thumb_pic in thumb_pics:
+                    thumb = thumb_pic.get('thumbnail_pic')
+                    middl = thumb.replace('/thumbnail/', '/bmiddle/')
+                    origi = thumb.replace('/thumbnail/', '/large/')
+                    p_s['imgs'].append({
+                        'thumb': thumb,
+                        'middl': middl,
+                        'origi': origi
+                    })
 
-            p_s['imgs'] = []
-            thumb_pics = r_s.get('pic_urls')
-            for thumb_pic in thumb_pics:
-                thumb = thumb_pic.get('thumbnail_pic')
-                middl = thumb.replace('/thumbnail/', '/bmiddle/')
-                origi = thumb.replace('/thumbnail/', '/large/')
-                p_s['imgs'].append({
-                    'thumb': thumb,
-                    'middl': middl,
-                    'origi': origi
-                })
+                u = r_s.get('user')
+                p_s['writer'] = u.get('name')
+                p_s['screen_name'] = u.get('screen_name')
+                p_s['profile'] = u.get('profile_image_url')
+                p_s['type'] = 'weibo'
+                p_s['id'] = r_s.get('id')
+                p_s['liked'] = r_s.get('liked', False)
+                retwed_msg = r_s.get('retweeted_status')
+                if retwed_msg:
+                    p_s['retwed_msg'] = extract_r_s(retwed_msg)
+                return p_s
 
-            u = r_s.get('user')
-            p_s['writer'] = u.get('name')
-            p_s['screen_name'] = u.get('screen_name')
-            p_s['profile'] = u.get('profile_image_url')
-            p_s['type'] = 'weibo'
-            p_s['id'] = r_s.get('id')
-            p_s['liked'] = r_s.get('liked', False)
-
+            p_s = extract_r_s(r_s)
             pro_statuses.append(p_s)
 
         return pro_statuses
