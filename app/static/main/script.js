@@ -31,7 +31,9 @@ $(document).ready(function () {
             var site = $(this).closest('.cls-message-retw').prop('id').split('-')[2];
             var input_box = $(this).parent().siblings('.modal-body').children('input');
             var reply_text = input_box.prop('value');
-
+            var orig_text = $(this).parents('.cls-message-content').children('.cls-message-text').eq(0).text();
+            var screen_name = $(this).parents('.cls-message-right').find('.cls-user-screen-name').text();
+            reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
             if (reply_text && reply_text.trim()) {
 
                 if (site == 'weibo') {
@@ -45,7 +47,7 @@ $(document).ready(function () {
                     {
                         id: id,
                         reply: reply_text,
-                        screen_name: $(this).parents('.cls-message-right').find('.cls-user-screen-name').text(),
+                        screen_name: screen_name,
                         _xsrf: get_xsrf()
                     }, function (data) {
                         data = $.parseJSON(data);
