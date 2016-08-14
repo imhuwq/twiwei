@@ -60,7 +60,7 @@ class RetwMessageHandler(BaseHandler):
         if reply:
             reply_text = 'RT @%s: %s https://twitter.com/%s/statuses/%s' % (screen_name, reply, screen_name, twi_id)
         else:
-            reply_text = 'RT @%s' % screen_name
+            reply_text = 'RT @%s https://twitter.com/%s/statuses/%s' % (screen_name, screen_name, twi_id)
         if user and twi_id:
             result = yield twitter.retw_with_comment(user.c_twi_token, user.c_twi_secret, reply_text)
 
