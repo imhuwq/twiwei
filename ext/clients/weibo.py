@@ -76,6 +76,9 @@ class Weibo(object):
                 retwed_msg = r_s.get('retweeted_status')
                 if retwed_msg:
                     p_s['retwed_msg'] = extract_r_s(retwed_msg)
+                    p_s['is_original'] = False
+                else:
+                    p_s['is_original'] = True
                 return p_s
 
             p_s = extract_r_s(r_s)

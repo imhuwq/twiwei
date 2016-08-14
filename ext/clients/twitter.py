@@ -144,8 +144,13 @@ class Twitter(object):
                 p_s['type'] = 'twitter'
                 p_s['id'] = str(r_s.get('id'))
                 quoted_status = r_s.get('quoted_status', None)
+
                 if quoted_status:
                     p_s['retwed_msg'] = extract_r_s(quoted_status)
+                    p_s['is_original'] = False
+                else:
+                    p_s['is_original'] = True
+
                 return p_s
 
             status = extract_r_s(r_s)

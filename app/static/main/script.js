@@ -31,13 +31,17 @@ $(document).ready(function () {
             var site = $(this).closest('.cls-message-retw').prop('id').split('-')[2];
             var input_box = $(this).parent().siblings('.modal-body').children('input');
             var reply_text = input_box.prop('value');
-            var orig_text = $(this).parents('.cls-message-right').find('.cls-message-text').eq(0).text();
             var screen_name = $(this).parents('.cls-message-right').find('.cls-user-screen-name').eq(0).text();
-
-
+            var is_original = $(this).parents('.cls-message-items').attr('class').split('is-original-')[1];
+            var orig_text = $(this).parents('.cls-message-right').find('.cls-message-text').eq(0).text();
             if (site == 'weibo') {
+                if (is_original == 'false') {
+                    reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
+                }
+                else {
+                    reply_text = '转发微博';
+                }
                 site = 'weibo/retw_msg';
-                reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
             }
             else {
                 site = 'twitter/retw_msg'
@@ -180,7 +184,7 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
 // 设置消息的独特属性， 根据消息的来源和id而变化
 function set_type_specific_attrs(msg_item, item, max_width) {
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
-    msg_item.attr('class', 'container cls-message-items from-' + item.type);
+    msg_item.attr('class', 'container cls-message-items from-' + item.type + ' is-original-' + item.is_original);
 
     msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
 
