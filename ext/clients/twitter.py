@@ -121,26 +121,34 @@ class Twitter(object):
 
     @staticmethod
     def extract_raw_statuses(data):
+        raw_statuses = data
         statuses = []
-        for d in data:
-            status = dict()
-            status['writer'] = d.get('user').get('name')
-            status['screen_name'] = d.get('user').get('screen_name').strip()
-            status['text'] = re.sub(r'https://t.co/.*', '', d.get('text', ''))
-            status['profile'] = d.get('user').get('profile_image_url')
-            status['time'] = datetime.strptime(d.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
-            status['liked'] = d.get('favorited')
-            status['imgs'] = []
-            ext_ent = d.get('extended_entities')
-            if ext_ent:
-                for m in ext_ent.get('media'):
-                    if m.get('type', None) == 'photo':
-                        status['imgs'].append({
-                            'middl': m.get('media_url')
-                        })
-            status['type'] = 'twitter'
-            status['id'] = str(d.get('id'))
+        for r_s in raw_statuses:
+            def extract_r_s(r_s):
 
+                p_s = dict()
+                p_s['writer'] = r_s.get('user').get('name')
+                p_s['screen_name'] = r_s.get('user').get('screen_name').strip()
+                p_s['text'] = re.sub(r'https://t.co/.*', '', r_s.get('text', ''))
+                p_s['profile'] = r_s.get('user').get('profile_image_url')
+                p_s['time'] = datetime.strptime(r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
+                p_s['liked'] = r_s.get('favorited')
+                p_s['imgs'] = []
+                ext_ent = r_s.get('extended_entities')
+                if ext_ent:
+                    for m in ext_ent.get('media'):
+                        if m.get('type', None) == 'photo':
+                            p_s['imgs'].append({
+                                'middl': m.get('media_url')
+                            })
+                p_s['type'] = 'twitter'
+                p_s['id'] = str(r_s.get('id'))
+                quoted_status = r_s.get('quoted_status', None)
+                if quoted_status:
+                    p_s['retwed_msg'] = extract_r_s(quoted_status)
+                return p_s
+
+            status = extract_r_s(r_s)
             statuses.append(status)
 
         return statuses

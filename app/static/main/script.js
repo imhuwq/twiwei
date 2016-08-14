@@ -33,11 +33,12 @@ $(document).ready(function () {
             var reply_text = input_box.prop('value');
             var orig_text = $(this).parents('.cls-message-content').children('.cls-message-text').eq(0).text();
             var screen_name = $(this).parents('.cls-message-right').find('.cls-user-screen-name').text();
-            reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
+
             if (reply_text && reply_text.trim()) {
 
                 if (site == 'weibo') {
-                    site = 'weibo/retw_msg'
+                    site = 'weibo/retw_msg';
+                    reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
                 }
                 else {
                     site = 'twitter/retw_msg'
