@@ -31,36 +31,34 @@ $(document).ready(function () {
             var site = $(this).closest('.cls-message-retw').prop('id').split('-')[2];
             var input_box = $(this).parent().siblings('.modal-body').children('input');
             var reply_text = input_box.prop('value');
-            var orig_text = $(this).parents('.cls-message-content').children('.cls-message-text').eq(0).text();
-            var screen_name = $(this).parents('.cls-message-right').find('.cls-user-screen-name').text();
+            var orig_text = $(this).parents('.cls-message-right').find('.cls-message-text').eq(0).text();
+            var screen_name = $(this).parents('.cls-message-right').find('.cls-user-screen-name').eq(0).text();
 
-            if (reply_text && reply_text.trim()) {
 
-                if (site == 'weibo') {
-                    site = 'weibo/retw_msg';
-                    reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
-                }
-                else {
-                    site = 'twitter/retw_msg'
-                }
-
-                $.post($SCRIPT_ROOT + site,
-                    {
-                        id: id,
-                        reply: reply_text,
-                        screen_name: screen_name,
-                        _xsrf: get_xsrf()
-                    }, function (data) {
-                        data = $.parseJSON(data);
-                        if (data.status == 200) {
-                            window.location.replace('/')
-                        }
-                        else {
-                            alert(data.msg)
-                        }
-
-                    });
+            if (site == 'weibo') {
+                site = 'weibo/retw_msg';
+                reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
             }
+            else {
+                site = 'twitter/retw_msg'
+            }
+
+            $.post($SCRIPT_ROOT + site,
+                {
+                    id: id,
+                    reply: reply_text,
+                    screen_name: screen_name,
+                    _xsrf: get_xsrf()
+                }, function (data) {
+                    data = $.parseJSON(data);
+                    if (data.status == 200) {
+                        window.location.replace('/')
+                    }
+                    else {
+                        alert(data.msg)
+                    }
+
+                });
             input_box.prop('value', '');
             $(this).siblings('.cls-retw-modal-cancel').trigger('click')
         });
