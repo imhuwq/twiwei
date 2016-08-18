@@ -35,11 +35,11 @@ $(document).ready(function () {
             var is_original = $(this).parents('.cls-message-items').attr('class').split('is-original-')[1];
             var orig_text = $(this).parents('.cls-message-right').find('.cls-message-text').eq(0).text();
             if (site == 'weibo') {
-                if (is_original == 'false') {
-                    reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
+                if (is_original == 'true' && !reply_text) {
+                    reply_text = '转发微博';
                 }
                 else {
-                    reply_text = '转发微博';
+                    reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
                 }
                 site = 'weibo/retw_msg';
             }
