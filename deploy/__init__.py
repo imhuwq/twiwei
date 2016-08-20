@@ -73,7 +73,6 @@ def _update_database(source_folder):
             % source_folder)
 
 
-# TODO: 使用 supervisor 监控 tornado 后再实现该功能
 def _restart_server():
     sudo('supervisorctl -c /etc/supervisor/supervisord.conf restart twiwei-8000')
     time.sleep(5)
