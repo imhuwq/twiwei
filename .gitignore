@@ -1,7 +1,8 @@
+.idea
 env
+migs
+alembic.ini
 *.pyc
 te.py
-.idea
 config.py
-develop.sqlite
-test.sqlite
+*.sqlite
