@@ -1,8 +1,8 @@
 import os
-from subprocess import call
+import time
 
 from fabric.contrib.files import exists, sed
-from fabric.api import env, local, run, cd, prefix, put
+from fabric.api import env, local, run, cd, prefix, put, sudo
 from contextlib import contextmanager
 
 REPO_URL = 'https://github.com/imhuwq/twiwei.git'
@@ -75,4 +75,6 @@ def _update_database(source_folder):
 
 # TODO: 使用 supervisor 监控 tornado 后再实现该功能
 def _restart_server():
-    pass
+    sudo('supervisorctl -c /etc/supervisor/supervisord.conf restart twiwei-8000')
+    time.sleep(5)
+    sudo('supervisorctl -c /etc/supervisor/supervisord.conf restart twiwei-8001')
