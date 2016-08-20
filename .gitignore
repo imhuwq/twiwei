@@ -3,6 +3,7 @@ env
 migs
 alembic.ini
 *.pyc
+random_key.txt
 te.py
 config.py
 *.sqlite

@@ -49,7 +49,7 @@ def _get_latest_source(source_folder):
 def _update_configs(source_folder):
     local_config = local_path + '/config.py'
     remote_config = source_folder + '/config.py'
-    call(['rsync', '-azP', local_config, remote_config])
+    put(local_config, remote_config)
     sed(remote_config, "USE_PROXY = True", "USE_PROXY = False")
 
 
