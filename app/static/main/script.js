@@ -38,7 +38,7 @@ $(document).ready(function () {
                 if (is_original == 'true' && !reply_text) {
                     reply_text = '转发微博';
                 }
-                else {
+                else if (is_original == 'false') {
                     reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
                 }
                 site = 'weibo/retw_msg';

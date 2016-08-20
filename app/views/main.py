@@ -26,7 +26,8 @@ class LoadHomeHandler(BaseHandler):
         statuses = []
         if user:
 
-            data_wei = yield self.cache.get('weibo')
+            data_wei, data_twi = yield [self.cache.get('weibo'), self.cache.get('twitter')]
+
             if data_wei:
                 data_wei = data_wei[0:20]
             else:
@@ -38,7 +39,6 @@ class LoadHomeHandler(BaseHandler):
                 self.set_cookie('wei_max', str(data_wei[-1]['id']))
                 statuses.extend(data_wei)
 
-            data_twi = yield self.cache.get('twitter')
             if data_twi:
                 data_twi = data_twi[0:20]
             else:
