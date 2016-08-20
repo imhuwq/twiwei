@@ -1,6 +1,7 @@
 .idea
 env
 migs
+confs
 alembic.ini
 *.pyc
 random_key.txt
