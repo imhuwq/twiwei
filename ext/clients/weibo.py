@@ -52,9 +52,12 @@ class Weibo(object):
             def extract_r_s(r_s):
                 p_s = dict()
                 p_s['time'] = datetime.strptime(r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
-                p_s['text'] = r_s.get('text')
-
+                text = r_s.get('text')
+                p_s['text'] = text
                 p_s['imgs'] = []
+                if text == '抱歉，此微博已被作者删除。查看帮助：http://t.cn/zWSudZc':
+                    return p_s
+
                 thumb_pics = r_s.get('pic_urls')
                 for thumb_pic in thumb_pics:
                     thumb = thumb_pic.get('thumbnail_pic')
