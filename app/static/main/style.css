@@ -153,13 +153,11 @@ body {
 
 .is-liked-false {
     color: lightgray;
-    float: right;
     text-align: right;
 }
 
 .is-liked-true {
     color: #d9534f !important;
-    float: right;
     text-align: right;
 }
 
