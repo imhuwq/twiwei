@@ -186,8 +186,11 @@ function set_type_specific_attrs(msg_item, item, max_width) {
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
     msg_item.attr('class', 'container cls-message-items from-' + item.type + ' is-original-' + item.is_original);
 
-    msg_item.find('.cls-like-msg').addClass('is-liked-' + item.liked);
-
+    var like_action_icon = msg_item.find('.cls-like-msg');
+    like_action_icon.addClass('is-liked-' + item.liked);
+    if (item.type == 'weibo') {
+        like_action_icon.attr('title', '微博无法点赞');
+    }
     var reply_div_id = "id-reply-" + item.type + "-" + item.id;
     msg_item.find('.cls-message-reply').attr('id', reply_div_id).css('max-width', max_width);
     msg_item.find('.cls-reply-msg').attr('data-target', '#' + reply_div_id);
@@ -408,6 +411,11 @@ function like_or_unlike_msg(msg) {
         liked: liked,
         _xsrf: get_xsrf()
     };
+
+    if (type == 'weibo') {
+        alert('微博无法点赞');
+        return
+    }
 
     if (liked == 'false') {
         temporally_like_action(msg, 'like');
