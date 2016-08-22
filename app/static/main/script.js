@@ -1,6 +1,6 @@
 $(document).ready(function () {
     if (window.location.pathname == '/') {
-        load_home('load_home');
+        request_statuses('load_home');
 
         var load_more = $("#id-load-more");
         load_more.on('click', function () {
@@ -313,6 +313,8 @@ function create_new_img(cls, style, img_object, imgs_container, is_single_img) {
 
 // 向特定 url 通过 ajax 请求时间线消息的 json 数据
 function request_statuses(url) {
+    $('#id-load-more-text').text('正在加载...');
+    $('#id-load-more').attr('style', 'background-color: rgb(245, 245, 245)');
     $.get($SCRIPT_ROOT + url, {}, function (data) {
         data = $.parseJSON(data);
         if (data.status == 200) {
@@ -323,11 +325,9 @@ function request_statuses(url) {
         else {
             alert(data.msg)
         }
+        $('#id-load-more-text').text('加载更多');
+        $('#id-load-more').attr('style', 'background-color: rgb(255, 255, 255)');
     });
-}
-
-function load_home(url) {
-    request_statuses(url)
 }
 
 function focus_mode(selector, on, out, dynamic) {
