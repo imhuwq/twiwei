@@ -177,12 +177,14 @@ function set_general_attrs(msg_item, item, max_width, max_height) {
     msg_item.find('.cls-user-name').text(item.writer);
     msg_item.find('.cls-user-screen-name').text(item.screen_name);
     msg_item.find('.cls-message-time').text(moment(item.time).fromNow());
-    msg_item.find('.cls-message-text').text(item.text);
-    msg_item.find('.cls-message-text').css("width", max_width);
 }
 
 // 设置消息的独特属性， 根据消息的来源和id而变化
 function set_type_specific_attrs(msg_item, item, max_width) {
+    var status_text = capture_links(item.text, item.type);
+    msg_item.find('.cls-message-text').html(status_text);
+    msg_item.find('.cls-message-text').css("width", max_width);
+
     msg_item.attr('id', 'id-' + item.type + '-' + item.id);
     msg_item.attr('class', 'container cls-message-items from-' + item.type + ' is-original-' + item.is_original);
 
@@ -460,6 +462,29 @@ function roll_back_like_action(msg, prev_action) {
         new_cls = cls.replace('liked-false', 'liked-true')
     }
     msg.find('.cls-like-msg').attr('class', new_cls);
+}
+
+function capture_links(text, type) {
+    text = text.replace(/(http:\/\/[a-zA-Z\d.\/]+)/g, '<a href="$1" target="_blank">$1</a>');
+    // text = text.replace(/#(.*?)#/g, '<a href="/topic/weibo/$1" target="_blank">#$1#</a>');
+    // text = text.replace(/#([!#])\s/g, '<a href="/topic/twitter/$1" target="_blank">#$1</a>&nbsp;');
+    // if (type == 'weibo') {
+    //     text = text.replace(/@(.*?):/g, '<a href="/user/weibo/$1">@$1:</a>');
+    // }
+    // else {
+    //     text = text.replace(/@(.*?):/g, '<a href="/user/twitter/$1" target="_blank">@$1:</a>');
+    // }
+    // return text
+
+    text = text.replace(/#(.*?)#/g, '<a href="#">#$1#</a>');
+    text = text.replace(/#([!#])\s/g, '<a href="#">#$1</a>&nbsp;');
+    if (type == 'weibo') {
+        text = text.replace(/@(.*?):/g, '<a href="#">@$1:</a>');
+    }
+    else {
+        text = text.replace(/@(.*?):/g, '<a href="#">@$1:</a>');
+    }
+    return text
 }
 
 function get_xsrf() {
