@@ -477,13 +477,8 @@ function capture_links(text, type) {
     // return text
 
     text = text.replace(/#(.*?)#/g, '<a href="#">#$1#</a>');
-    text = text.replace(/#([!#])\s/g, '<a href="#">#$1</a>&nbsp;');
-    if (type == 'weibo') {
-        text = text.replace(/@(.*?):/g, '<a href="#">@$1:</a>');
-    }
-    else {
-        text = text.replace(/@(.*?):/g, '<a href="#">@$1:</a>');
-    }
+    text = text.replace(/#([!#])\s?/g, '<a href="#">#$1</a>&nbsp;');
+    text = text.replace(/@(.*?)([\:\s])/g, '<a href="#">@$1</a>$2');
     return text
 }
 
