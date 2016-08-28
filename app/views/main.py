@@ -229,6 +229,18 @@ class UserAccountHandler(BaseHandler):
         return self.render('main/account.html')
 
 
+class UserPageHandler(BaseHandler):
+    @coroutine
+    def get(self, site, screen_name):
+        return self.write('%s from %s' % (screen_name, site))
+
+
+class TopicPageHandler(BaseHandler):
+    @coroutine
+    def get(self, site, topic):
+        return self.write('%s from %s' % (topic, site))
+
+
 handlers = [
     (r"/", IndexHandler),
     (r"/login", LoginHandler),
@@ -237,5 +249,7 @@ handlers = [
     (r"/load_home", LoadHomeHandler),
     (r"/load_more", LoadMoreHandler),
     (r"/oauth2/twitter/access_token/", TwitterCallbackHandler),
-    (r"/oauth2/weibo/access_token/", WeiboCallbackHandler)
+    (r"/oauth2/weibo/access_token/", WeiboCallbackHandler),
+    (r"/user/(.*?)/(.*?)", UserPageHandler),
+    (r"/topic/(.*?)/(.*?)", UserPageHandler)
 ]

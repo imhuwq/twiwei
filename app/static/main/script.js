@@ -117,6 +117,10 @@ $(document).ready(function () {
         focus_mode("#id-login-by-twi", 1, 0.5)
     }
 
+    if (window.location.pathname.match(/\/user/)) {
+        alert('ok')
+    }
+
 });
 
 
@@ -269,8 +273,7 @@ function set_imgs_style(msg_item, item, max_width, max_height) {
     new_imgs.appendTo(msg_item.find('.cls-message-content'));
 }
 
-// 创建新的图片元素， 插入到每个消息的图片容器中
-//    该函数被 set_img_style 调用
+// 创建新的图片元素， 插入到每个消息的图片容器中. 该函数被 set_img_style 调用
 function create_new_img(cls, style, img_object, imgs_container, is_single_img) {
     var new_img_wrapper = $('<div/>', {
         class: cls,
@@ -465,20 +468,20 @@ function roll_back_like_action(msg, prev_action) {
 }
 
 function capture_links(text, type) {
+    // 捕获超链接
     text = text.replace(/(http:\/\/[a-zA-Z\d.\/]+)/g, '<a href="$1" target="_blank">$1</a>');
-    // text = text.replace(/#(.*?)#/g, '<a href="/topic/weibo/$1" target="_blank">#$1#</a>');
-    // text = text.replace(/#([!#])\s/g, '<a href="/topic/twitter/$1" target="_blank">#$1</a>&nbsp;');
-    // if (type == 'weibo') {
-    //     text = text.replace(/@(.*?):/g, '<a href="/user/weibo/$1">@$1:</a>');
-    // }
-    // else {
-    //     text = text.replace(/@(.*?):/g, '<a href="/user/twitter/$1" target="_blank">@$1:</a>');
-    // }
-    // return text
 
-    text = text.replace(/#(.*?)#/g, '<a href="#">#$1#</a>');
-    text = text.replace(/#([!#])\s?/g, '<a href="#">#$1</a>&nbsp;');
-    text = text.replace(/@(.*?)([\:\s])/g, '<a href="#">@$1</a>$2');
+    // 捕获 #topic 链接
+    text = text.replace(/#(.*?)#/g, '<a href="/topic/weibo/$1" target="_blank">#$1#</a>');
+    text = text.replace(/#([!#])\s/g, '<a href="/topic/twitter/$1" target="_blank">#$1</a>&nbsp;');
+
+    // 捕获 @username 链接
+    if (type == 'weibo') {
+        text = text.replace(/@(.*?)([\:\s])/g, '<a href="/user/weibo/$1">@$1:</a>');
+    }
+    else {
+        text = text.replace(/@(.*?)([\:\s])/g, '<a href="/user/twitter/$1" target="_blank">@$1:</a>');
+    }
     return text
 }
 

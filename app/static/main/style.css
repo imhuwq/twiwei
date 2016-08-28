@@ -224,3 +224,40 @@ body {
 #id-login-by-wei {
     color: #c7254e;
 }
+
+/************************************************
+* 3. user info                                  *
+************************************************/
+
+#id-user-info {
+    width: 100%;
+    padding: 10px;
+    margin: 0 0 20px 0;
+    background-color: white;
+    box-shadow: 1px 5px 5px rgb(235, 235, 235);
+}
+
+#id-user-detail {
+    padding: 0;
+}
+
+#id-user-detail div {
+    margin-bottom: 1em;
+}
+
+#id-user-detail span {
+    margin-right: 2em;
+}
+
+#id-user-img {
+    padding: 0;
+}
+
+#id-user-img span {
+    float: right;
+    clear: right;
+}
+
+#id-user-img img {
+    float: right;
+}
