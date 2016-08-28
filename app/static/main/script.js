@@ -33,13 +33,9 @@ $(document).ready(function () {
             var reply_text = input_box.prop('value');
             var screen_name = $(this).parents('.cls-message-right').find('.cls-user-screen-name').eq(0).text();
             var is_original = $(this).parents('.cls-message-items').attr('class').split('is-original-')[1];
-            var orig_text = $(this).parents('.cls-message-right').find('.cls-message-text').eq(0).text();
             if (site == 'weibo') {
                 if (is_original == 'true' && !reply_text) {
                     reply_text = '转发微博';
-                }
-                else if (is_original == 'false') {
-                    reply_text = reply_text + ' //@' + screen_name + ':' + orig_text;
                 }
                 site = 'weibo/retw_msg';
             }
