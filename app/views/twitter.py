@@ -13,6 +13,7 @@ twitter = Twitter()
 
 
 class LikeHandler(BaseHandler):
+
     @coroutine
     def post(self):
         user = self.current_user
@@ -22,7 +23,8 @@ class LikeHandler(BaseHandler):
             if result:
                 cache = yield self.cache.get('twitter')
                 if cache:
-                    liked_msg = [msg for msg in cache if msg['id'] == twi_id][0]
+                    liked_msg = [
+                        msg for msg in cache if msg['id'] == twi_id][0]
                     liked_msg['liked'] = True
                     self.cache.set(ttl=0, twitter=cache)
                 return self.write(json_encode({'status': 200, 'msg': ''}))
@@ -32,6 +34,7 @@ class LikeHandler(BaseHandler):
 
 
 class UnLikeHandler(BaseHandler):
+
     @coroutine
     def post(self):
         user = self.current_user
@@ -41,7 +44,8 @@ class UnLikeHandler(BaseHandler):
             if result is False:
                 cache = yield self.cache.get('twitter')
                 if cache:
-                    liked_msg = [msg for msg in cache if msg['id'] == twi_id][0]
+                    liked_msg = [
+                        msg for msg in cache if msg['id'] == twi_id][0]
                     liked_msg['liked'] = False
                     self.cache.set(ttl=0, twitter=cache)
                 return self.write(json_encode({'status': 200, 'msg': ''}))
@@ -51,6 +55,7 @@ class UnLikeHandler(BaseHandler):
 
 
 class RetwMessageHandler(BaseHandler):
+
     @coroutine
     def post(self):
         user = self.current_user
@@ -58,9 +63,11 @@ class RetwMessageHandler(BaseHandler):
         screen_name = self.get_argument('screen_name')
         reply = self.get_argument('reply')
         if reply:
-            reply_text = 'RT @%s: %s https://twitter.com/%s/statuses/%s' % (screen_name, reply, screen_name, twi_id)
+            reply_text = 'RT @%s: %s https://twitter.com/%s/statuses/%s' % (
+                screen_name, reply, screen_name, twi_id)
         else:
-            reply_text = 'RT @%s https://twitter.com/%s/statuses/%s' % (screen_name, screen_name, twi_id)
+            reply_text = 'RT @%s https://twitter.com/%s/statuses/%s' % (
+                screen_name, screen_name, twi_id)
         if user and twi_id:
             result = yield twitter.retw_with_comment(user.c_twi_token, user.c_twi_secret, reply_text)
 
@@ -72,6 +79,7 @@ class RetwMessageHandler(BaseHandler):
 
 
 class ReplyMessageHandler(BaseHandler):
+
     @coroutine
     def post(self):
         user = self.current_user

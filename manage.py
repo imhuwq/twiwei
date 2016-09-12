@@ -21,8 +21,11 @@ if cmd == 'deploy':
     deploy(server)
 
 elif cmd == 'runserver':
-    tornado.options.define("mode", default="develop", help="以何种方式运行(develop/test/product)， 默认为 develop")
-    tornado.options.define("port", default=8000, type=int, help="侦听端口， 默认为 8000")
+    tornado.options.define(
+        "mode", default="develop",
+        help="以何种方式运行(develop/test/product)， 默认为 develop")
+    tornado.options.define(
+        "port", default=8000, type=int, help="侦听端口， 默认为 8000")
     tornado.options.parse_command_line(sys.argv[1:])
 
     if __name__ == "__main__":
@@ -30,7 +33,6 @@ elif cmd == 'runserver':
         def sig_handler(sig, frame):
             logging.warning('Caught signal: %s', sig)
             tornado.ioloop.IOLoop.instance().add_callback(shutdown)
-
 
         def shutdown():
             logging.info('正在关闭服务器...')
@@ -43,14 +45,14 @@ elif cmd == 'runserver':
 
             def stop_loop():
                 now = time.time()
-                if now < deadline and (io_loop._callbacks or io_loop._timeouts):
+                if now < deadline and\
+                        (io_loop._callbacks or io_loop._timeouts):
                     io_loop.add_timeout(now + 1, stop_loop)
                 else:
                     logging.info('正在关闭 IO Loop...')
                     io_loop.stop()
 
             stop_loop()
-
 
         mode = tornado.options.options.mode
         port = tornado.options.options.port
