@@ -6,5 +6,7 @@ alembic.ini
 *.pyc
 random_key.txt
 te.py
+te.json
 config.py
 *.sqlite
+.python-version

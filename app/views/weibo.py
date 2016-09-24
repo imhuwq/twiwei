@@ -38,7 +38,22 @@ class ReplyMessageHandler(BaseHandler):
         return self.write(json_encode({'status': 500, 'msg': '操作失败'}))
 
 
+class GetMessageReplyHnadler(BaseHandler):
+    @coroutine
+    def get(self):
+        wei_id = self.get_argument('id')
+        since_id = self.get_argument('since_id', 0)
+        max_id = self.get_argument('max_id', 0)
+        user = self.current_user
+        if user and wei_id:
+            result = yield weibo.get_weibo_replies(user.c_wei_token, wei_id, since_id, max_id)
+            if result:
+                return self.write(json_encode({'status': 200, 'replies': result}))
+        return self.write(json_encode({'status': 500, 'msg': '操作失败'}))
+
+
 handlers = [
     (r"/weibo/retw_msg", RetwMessageHandler),
-    (r"/weibo/reply_msg", ReplyMessageHandler)
+    (r"/weibo/reply_msg", ReplyMessageHandler),
+    (r"/weibo/reply_list", GetMessageReplyHnadler),
 ]

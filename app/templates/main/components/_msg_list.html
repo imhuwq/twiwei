@@ -37,7 +37,7 @@
                     <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-retweet cls-retw-msg" title="转发"
                           data-toggle="modal" data-target="#id-retw-weibo-1234567"></span>
                     <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-share-alt cls-reply-msg" title="评论"
-                          data-toggle="collapse" data-target="#id-reply-wei-1234567"></span>
+                          data-toggle="collapse" data-target="#id-reply-wei-1234567" expanded="false"></span>
                     <span class="col-md-3 col-sm-3 col-xs-3 glyphicon glyphicon-heart cls-like-msg" title="喜欢"></span>
                 </div>
 
@@ -61,8 +61,32 @@
 
 
                 <div class="collapse cls-message-reply" id="id-reply-weibo-1234567">
-                    <div class="input-group input-group-sm">
+
+                    <div class="cls-message-reply-list">
+                        <ol class="" style="padding-left: 0; margin-top: 10px">
+                            <li class="cls-message-reply-item clearfix" style="display: none;">
+                                <a class="cls-reply-user-info" style="cursor: pointer">
+                                    user_name
+                                </a>:
+
+                                <span class="cls-reply-text">
+                                    一二三四五， 上山打老虎， 老虎没打着， 打着小松鼠
+                                    <span class="cls-reply-time" style="color: lightgray">(2 hours ago)</span>
+                                </span>
+
+
+                                <span class="btn btn-link cls-reply-reply" style="padding:0;">
+                                    回复
+                                </span>
+
+                                <span><hr style="margin-bottom: 5px;margin-top: 10px"></span>
+                            </li>
+
+                        </ol>
+                    </div>
+                    <div class="input-group input-group-sm" style="clear: both">
                         <input type="text" class="form-control cls-reply-text">
+                        <span class="input-group-addon btn cls-reply-cancel" style="border-left: 0">收起</span>
                         <span class="input-group-addon btn cls-reply-btn">回复</span>
                     </div>
 

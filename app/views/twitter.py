@@ -1,13 +1,8 @@
-from datetime import datetime, timedelta
-
 from tornado.escape import json_encode
-from tornado.web import authenticated
 from tornado.gen import coroutine
-from dateutil import parser
 
 from ext.application import BaseHandler
-from ext.clients import Twitter, Weibo
-from ..models.main import User
+from ext.clients import Twitter
 
 twitter = Twitter()
 
@@ -97,13 +92,20 @@ class ReplyMessageHandler(BaseHandler):
         return self.write(json_encode({'status': 500, 'msg': '操作失败'}))
 
 
+class GetMessageReplyHnadler(BaseHandler):
+
+    @coroutine
+    def get(self):
+        twi_id = self.get_argument('id')
+        user = self.current_user
+        if user and twi_id:
+            return self.write(json_encode({'status': 500, 'msg': 'test'}))
+        return self.write(json_encode({'status': 500, 'msg': 'anonymous'}))
+
 handlers = [
     (r"/twitter/like_msg", LikeHandler),
     (r"/twitter/unlike_msg", UnLikeHandler),
     (r"/twitter/retw_msg", RetwMessageHandler),
-    (r"/twitter/reply_msg", ReplyMessageHandler)
+    (r"/twitter/reply_msg", ReplyMessageHandler),
+    (r"/twitter/reply_list", GetMessageReplyHnadler),
 ]
-
-# todo: session expire mechanism
-# todo: momoko async db pool
-# todo: transfer from sql data to json in postgresql

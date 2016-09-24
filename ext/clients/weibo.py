@@ -4,14 +4,14 @@ import json
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.httputil import url_concat
 from tornado.gen import coroutine
-from tornado.escape import url_escape
 
 from config import WEI_CLIENT_ID, WEI_CLIENT_SECRET, WEI_ADMIN_TOKEN
 
 
 class Weibo(object):
     def __init__(self):
-        AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+        AsyncHTTPClient.configure(
+            "tornado.curl_httpclient.CurlAsyncHTTPClient")
         self.client = AsyncHTTPClient()
 
         # 开发者 token
@@ -51,7 +51,8 @@ class Weibo(object):
         for r_s in raw_statuses:
             def extract_r_s(r_s):
                 p_s = dict()
-                p_s['time'] = datetime.strptime(r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
+                p_s['time'] = datetime.strptime(
+                    r_s.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
                 text = r_s.get('text')
                 p_s['text'] = text
                 p_s['imgs'] = []
@@ -90,9 +91,37 @@ class Weibo(object):
         return pro_statuses
 
     @staticmethod
+    def extract_raw_replys(data):
+        raw_replys = data.get('comments', [])
+        pro_replys = []
+        for r_r in raw_replys:
+            def extract_r_r(r_r):
+                p_s = dict()
+                p_s['user'] = r_r.get('user').get('screen_name')
+                p_s['profile'] = r_r.get('user').get('profile_image_url')
+                # p_s['reply_to_user'] = r_r.get('reply_comment').get('user').get('screen_name')
+                p_s['text'] = r_r.get('text')
+                p_s['time'] = datetime.strptime(
+                    r_r.get('created_at'), '%a %b %d %H:%M:%S %z %Y').isoformat()
+                p_s['id'] = r_r.get('id')
+                return p_s
+
+            pro_replys.append(extract_r_r(r_r))
+
+        pro_data = {
+            'replies': pro_replys,
+            'count': data.get('total_number'),
+            'max_id': data.get('max_id'),
+            'since_id': data.get('since_id')
+        }
+
+        return pro_data
+
+    @staticmethod
     def gen_requests(method='GET', url=None, **kwargs):
         url = url_concat(url, kwargs)
-        request = HTTPRequest(method=method, url=url, allow_nonstandard_methods=True)
+        request = HTTPRequest(method=method, url=url,
+                              allow_nonstandard_methods=True)
         return request
 
     #######################
@@ -149,12 +178,8 @@ class Weibo(object):
     @coroutine
     def get_user_timeline(self, token, **kwargs):
         if token:
-            params = {
-                'access_token': token
-            }
-            for key, value in kwargs.items():
-                params[key] = value
-            request = self.gen_requests('GET', self.user_home_url, **params)
+            kwargs['access_token'] = token
+            request = self.gen_requests('GET', self.user_home_url, **kwargs)
             response = yield self.client.fetch(request)
             response = json.loads(response.body.decode())
             statuses = self.extract_raw_status(response)
@@ -180,32 +205,28 @@ class Weibo(object):
     ######################
     @coroutine
     def like_this_weibo(self, access_token, wei_id):
-        params = {
-            'access_token': access_token,
-            'id': wei_id
-        }
-        request = self.gen_requests('POST', self.like_weibo_url, **params)
+        request = self.gen_requests(
+            'POST', self.like_weibo_url, access_token=access_token, id=wei_id)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
         return response.get('favorited')
 
     @coroutine
     def unlike_this_weibo(self, access_token, wei_id):
-        params = {
-            'access_token': access_token,
-            'id': wei_id
-        }
-        request = self.gen_requests('POST', self.like_weibo_url, params=params)
-        response = yield self.client.fetch(request)
+        request = self.gen_requests(
+            'POST', self.like_weibo_url, access_token=access_token, id=wei_id)
+        response = yield self.client_secret.fetch(request)
         response = json.loads(response.body.decode())
         return response.get('favorited')
 
     @coroutine
     def get_weibo_replies(self, access_token, wei_id, since_id=0, max_id=0, **kwargs):
         request = self.gen_requests('GET', self.get_replies_url, access_token=access_token,
-                                    wei_id=wei_id, since_id=since_id, max_id=max_id, **kwargs)
+                                    id=wei_id, since_id=since_id, max_id=max_id, **kwargs)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
+        replies = self.extract_raw_replys(response)
+        return replies
 
     @coroutine
     def repost_message(self, access_token, wei_id, text):
