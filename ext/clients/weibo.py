@@ -91,7 +91,7 @@ class Weibo(object):
         return pro_statuses
 
     @staticmethod
-    def extract_raw_replys(data):
+    def extract_raw_replies(data):
         raw_replys = data.get('comments', [])
         pro_replys = []
         for r_r in raw_replys:
@@ -225,7 +225,7 @@ class Weibo(object):
                                     id=wei_id, since_id=since_id, max_id=max_id, **kwargs)
         response = yield self.client.fetch(request)
         response = json.loads(response.body.decode())
-        replies = self.extract_raw_replys(response)
+        replies = self.extract_raw_replies(response)
         return replies
 
     @coroutine

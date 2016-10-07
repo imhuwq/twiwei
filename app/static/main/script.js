@@ -106,17 +106,37 @@ $(document).ready(function () {
 
         function append_reply_list(toggle, data, site) {
             var replies = data.replies;
-            var page = Math.ceil(data.count / 20);
             var reply_list = toggle.closest('.cls-message-items').find('.cls-message-reply-list ol').eq(0);
             var template = reply_list.find('.cls-message-reply-item').eq(0).clone();
+            reply_list.empty();
             $.each(replies, function (index, item) {
                 var reply = template.clone();
                 reply.find('.cls-reply-user-info').html(gen_user_page_by_screen_name(item.user, site));
                 reply.find('.cls-reply-text').html(capture_links(item.text));
                 reply.attr('id', 'reply-' + site + '-' + item.id);
-                reply.attr('style', 'display: inline;border-bottom: none; position:relative');
+                reply.attr('style', 'display: inline');
                 reply.appendTo(reply_list)
-            })
+            });
+
+            var show_number = reply_list.find('.cls-message-reply-item').length;
+            if (show_number == 0) {
+                $('<ol/>', {
+                    class: 'cls-no-more-replies',
+                    text: '还没有评论哦'
+                }).appendTo(reply_list)
+            }
+            else if (0 < show_number < data.count) {
+                $('<ol/>', {
+                    class: 'cls-load-more-replies',
+                    text: '还有' + (data.count - show_number) + '条评论'
+                }).appendTo(reply_list)
+            }
+            else {
+                $('<ol/>', {
+                    class: 'cls-no-more-replies',
+                    text: '全部看完啦'
+                }).appendTo(reply_list)
+            }
         }
 
         msg_list.on('click', '.cls-reply-msg', function () {

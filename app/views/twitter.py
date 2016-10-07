@@ -8,7 +8,6 @@ twitter = Twitter()
 
 
 class LikeHandler(BaseHandler):
-
     @coroutine
     def post(self):
         user = self.current_user
@@ -29,7 +28,6 @@ class LikeHandler(BaseHandler):
 
 
 class UnLikeHandler(BaseHandler):
-
     @coroutine
     def post(self):
         user = self.current_user
@@ -50,7 +48,6 @@ class UnLikeHandler(BaseHandler):
 
 
 class RetwMessageHandler(BaseHandler):
-
     @coroutine
     def post(self):
         user = self.current_user
@@ -74,7 +71,6 @@ class RetwMessageHandler(BaseHandler):
 
 
 class ReplyMessageHandler(BaseHandler):
-
     @coroutine
     def post(self):
         user = self.current_user
@@ -93,7 +89,6 @@ class ReplyMessageHandler(BaseHandler):
 
 
 class GetMessageReplyHnadler(BaseHandler):
-
     @coroutine
     def get(self):
         twi_id = self.get_argument('id')
@@ -101,6 +96,7 @@ class GetMessageReplyHnadler(BaseHandler):
         if user and twi_id:
             return self.write(json_encode({'status': 500, 'msg': 'test'}))
         return self.write(json_encode({'status': 500, 'msg': 'anonymous'}))
+
 
 handlers = [
     (r"/twitter/like_msg", LikeHandler),

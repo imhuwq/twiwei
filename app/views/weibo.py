@@ -46,7 +46,7 @@ class GetMessageReplyHnadler(BaseHandler):
         max_id = self.get_argument('max_id', 0)
         user = self.current_user
         if user and wei_id:
-            result = yield weibo.get_weibo_replies(user.c_wei_token, wei_id, since_id, max_id)
+            result = yield weibo.get_weibo_replies(user.c_wei_token, wei_id, since_id, max_id, count=20)
             if result:
                 return self.write(json_encode({'status': 200, 'replies': result}))
         return self.write(json_encode({'status': 500, 'msg': '操作失败'}))

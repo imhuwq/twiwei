@@ -117,29 +117,6 @@ body {
 
 }
 
-.cls-message-reply .input-group {
-    margin-bottom: 1em;
-}
-
-.cls-message-reply input {
-    border-radius: 0;
-}
-
-.cls-message-reply .input-group-addon {
-    border-radius: 0;
-    background-color: rgb(250, 250, 250);
-}
-
-.cls-message-reply ul {
-    padding: 5px 0 0;
-    border-bottom: none;
-}
-
-.cls-message-reply li {
-    border-bottom: 1px solid rgb(204, 204, 204);
-    list-style-type: none;
-}
-
 .cls-message-retw .modal-content {
     border-radius: 0;
 }
@@ -223,4 +200,65 @@ body {
 
 #id-login-by-wei {
     color: #c7254e;
+}
+
+/************************************************
+* 3. reply list                                 *
+************************************************/
+
+.cls-message-reply-list ol {
+    padding-left: 0;
+    margin-top: 10px
+}
+
+.cls-reply-user-info {
+    cursor: pointer;
+}
+
+.cls-reply-time {
+    color: lightgray;
+}
+
+.cls-reply-reply {
+    padding: 0;
+}
+
+.cls-message-reply-list ol hr {
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.cls-load-more-replies, .cls-no-more-replies {
+    text-align: center;
+    color: lightgray;
+}
+
+.cls-load-more-replies {
+    cursor: pointer;
+}
+
+.input-group-sm {
+    clear: both;
+}
+
+.cls-reply-cancel {
+    border-left: 0;
+}
+
+.cls-message-reply-item {
+    border-bottom: none;
+    position: relative;
+}
+
+.cls-message-reply .input-group {
+    margin-bottom: 1em;
+}
+
+.cls-message-reply input {
+    border-radius: 0;
+}
+
+.cls-message-reply .input-group-addon {
+    border-radius: 0;
+    background-color: rgb(250, 250, 250);
 }
